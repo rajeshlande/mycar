@@ -110,3 +110,7 @@ Environment: Node.js 22.18.0, npm 11.12.1, Windows, Chromium via Playwright.
 | `npm audit` | 0 vulnerabilities reported |
 
 These checks do not verify a live Supabase project or successful GitHub Pages deployment.
+
+## Pages deployment rerun fix — 2026-11-02
+
+The failed deployment run `41338102553` had two successful build attempts, each uploading an artifact named `github-pages`. The deploy action therefore found two same-name artifacts and stopped. The Pages workflow now names the artifact with `github.run_attempt` and configures the deploy action to select that exact attempt's artifact. A successful hosted deployment still requires a subsequent GitHub Actions run; this local change does not itself verify deployment.
