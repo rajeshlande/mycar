@@ -33,12 +33,18 @@ No real Supabase project or mailbox was available during the build. SDK contract
 
 ```bash
 npm ci
+
+# macOS / Linux
 cp .env.example .env.local
-# Edit .env.local as described below.
+
+# Windows PowerShell
+Copy-Item .env.example .env.local
+
+# Edit .env.local as described below, then:
 npm run dev
 ```
 
-The development server binds to `0.0.0.0:5173`. Without credentials, use **Explore a sample workspace**. The in-app **Setup guide** explains the same configuration steps.
+The development server binds to `0.0.0.0` and prefers port `5173`. If that port is busy, Vite automatically tries the next free port; open the URL printed in the terminal. Without credentials, use **Explore a sample workspace**. The in-app **Setup guide** explains the same configuration steps.
 
 ## 2. Create the database
 
@@ -93,7 +99,7 @@ https://YOUR-APP.example/#/login
 https://YOUR-APP.example/#/reset-password
 ```
 
-For GitHub Pages, use `https://YOUR-USER.github.io/YOUR-REPO/` before each hash. Add only the preview origins you actually use; avoid an unrestricted production redirect wildcard.
+For GitHub Pages, use `https://YOUR-USER.github.io/YOUR-REPO/` before each hash. If local development prints a fallback port such as `5174`, allow that exact localhost origin too. Add only the preview origins you actually use; avoid an unrestricted production redirect wildcard.
 
 Keep email confirmations enabled. The client explicitly uses the **PKCE** flow. Use Supabase’s default `{{ .ConfirmationURL }}` email-link behavior, or ensure customized templates honor the requested redirect. Open recovery links in the same browser that requested them.
 
@@ -117,12 +123,18 @@ The built-in Supabase email service is for testing and is rate-limited. Configur
 ## Commands
 
 ```bash
-npm run dev              # Development on 0.0.0.0:5173
+npm run dev              # Development on 0.0.0.0; prefers 5173, falls back if busy
 npm run build            # Production build; relative base supports nested hosting
+npm run build:pages      # GitHub Pages build (same relative-base output)
 npm run preview          # Serve the production build on 0.0.0.0:4173
 npm test                 # Pure-logic tests + real SQL/RLS tests in PGlite
 npm run security:check   # Browser-source credential and worker-guard checks
 npm run check:agents     # Agent docs, skill frontmatter, links, and paths
+npm run check:pages      # Validate dist/ for GitHub Pages/PWA hosting
+npm run version:check    # Verify package/lockfile/changelog version alignment
+npm run version:patch    # Bump patch version and date changelog notes
+npm run version:minor    # Bump minor version and date changelog notes
+npm run version:major    # Bump major version and date changelog notes
 npm run test:browser     # Production UI tests + mocked Supabase contract tests
 ```
 
@@ -130,27 +142,87 @@ Browser tests require a production build first:
 
 ```bash
 npm run build
-npx playwright install --with-deps chromium
+npx playwright install chromium
+# Linux/CI may need: npx playwright install --with-deps chromium
 npm run test:browser
 ```
 
-The browser suite starts a production preview on port 4173 and a separate, fake-configured development server on port 5174. All Supabase requests in authentication tests are intercepted. No real credentials or mailbox are needed.
+The browser suite starts a production preview on port 4173 and a separate, fake-configured development server on port 5174. All Supabase requests in authentication tests are intercepted. No real credentials or mailbox are needed. The Playwright server environment is configured in `playwright.config.js`, so the command works on Windows, macOS, and Linux.
 
 Executed checks and remaining live-project checks are recorded in [`docs/VERIFICATION.md`](docs/VERIFICATION.md).
+
+## Version management
+
+`package.json` is the version source of truth. Release notes live in [`CHANGELOG.md`](CHANGELOG.md). The bump scripts update the package, lockfile, and changelog; they do not commit, tag, or push.
+
+```bash
+npm run version:check
+npm run version:patch   # or version:minor / version:major
+```
+
+See [`docs/VERSIONING.md`](docs/VERSIONING.md) for the release checklist and [`docs/GITHUB_PUSH.md`](docs/GITHUB_PUSH.md) for exact GitHub push/tag commands.
+
+## Troubleshooting
+
+### `Port 5173 is already in use`
+
+The current config prefers `5173` but no longer hard-fails when it is busy. Use the URL Vite prints, or choose another port:
+
+```bash
+npm run dev -- --port 5174
+```
+
+If you want to stop the old process on Windows, first identify it:
+
+```powershell
+Get-NetTCPConnection -LocalPort 5173 -State Listen | Select-Object LocalAddress, LocalPort, OwningProcess
+Get-Process -Id <PID>
+```
+
+Only stop it if you recognize it as an old Node/Vite server:
+
+```powershell
+Stop-Process -Id <PID> -Force
+```
+
+Command Prompt equivalent:
+
+```bat
+netstat -ano | findstr :5173
+tasklist /FI "PID eq <PID>"
+taskkill /PID <PID> /F
+```
+
+Do not kill an unknown PID. Closing the old terminal that ran `npm run dev` is often enough.
 
 ## Deployment
 
 ### GitHub Pages
 
-A workflow is included at `.github/workflows/pages.yml`.
+The project is configured for GitHub Pages project sites (`https://USER.github.io/REPO/`) and root/custom-domain sites. It uses a relative Vite base, hash routing, relative PWA paths, and `public/.nojekyll`.
 
-1. Push this project to a repository.
-2. Add repository Actions secrets named `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (public values only).
-3. In **Settings → Pages**, select **GitHub Actions** as the source.
-4. Push to `main` or run the workflow manually.
-5. Add the final Pages URL, including the repository path, to Supabase redirect settings.
+1. Push this project to a GitHub repository with the default branch `main`.
+2. In **Settings → Pages**, set **Source** to **GitHub Actions**.
+3. In **Settings → Secrets and variables → Actions**, add repository secrets:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY` (publishable or legacy anon key only)
+4. Push to `main`, or run **Deploy myCar to GitHub Pages** manually from the Actions tab.
+5. Open the deployed URL from the workflow’s `deploy` job.
+6. In Supabase **Authentication → URL Configuration**, set the Site URL and redirect URLs to the final Pages origin, including the repository path:
+   - `https://USER.github.io/REPO/#/login`
+   - `https://USER.github.io/REPO/#/reset-password`
 
-The workflow runs credential checks and logic/database tests, builds with a relative base, and deploys `dist`. Hash routing avoids server-side SPA rewrite requirements.
+The workflow runs credential/agent checks, logic/database tests, browser tests, builds with `npm run build:pages`, validates the output with `npm run check:pages`, and deploys `dist`. If the Supabase secrets are missing, the site still deploys but opens in setup/sample mode and the workflow prints a warning.
+
+Local Pages verification:
+
+```bash
+npm run build:pages
+npm run check:pages
+npm run preview -- --base=/YOUR-REPO/ --port 4175
+```
+
+Then open `http://localhost:4175/YOUR-REPO/`. Hash routing avoids server-side SPA rewrite requirements.
 
 ### Vercel, Netlify, or static hosting
 
@@ -184,7 +256,7 @@ The workflow runs credential checks and logic/database tests, builds with a rela
 
 - [`AGENTS.md`](AGENTS.md) is the canonical project rule set for coding agents.
 - [`CLAUDE.md`](CLAUDE.md) imports `AGENTS.md` and points Claude Code to the matching repo-local skills.
-- [`.claude/skills/`](.claude/README.md) contains four task-specific skills: `mycar-supabase`, `mycar-ui`, `mycar-pwa`, and `mycar-verify`.
+- [`.claude/skills/`](.claude/README.md) contains five task-specific skills: `mycar-supabase`, `mycar-ui`, `mycar-pwa`, `mycar-verify`, and `mycar-release`.
 
 The supplied yoga_studio reference contained a `CLAUDE.md` but no separate installed skill directories. myCar's guidance is adapted to this app; it does not import yoga_studio's ERP roles or RPC-only data contract. These files are repository instructions, not globally installed plugins or executable hooks.
 

@@ -28,7 +28,8 @@ The service worker may cache only public app shell/assets: HTML, built JS/CSS/fo
 ## Verify
 
 ```sh
-npm run build
+npm run build:pages
+npm run check:pages
 npm run test:browser
 npm run preview -- --base=/myCar/ --port 4175
 ```

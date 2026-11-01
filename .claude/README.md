@@ -16,5 +16,6 @@ The skills are deliberately scoped to myCar. They do not carry over yoga_studio'
 | `mycar-ui` | Changing pages/components, forms, charts, responsive layout, themes, or accessibility |
 | `mycar-pwa` | Changing manifest, icons, service worker, offline behavior, installability, or nested hosting |
 | `mycar-verify` | Choosing checks, reproducing bugs, recording evidence, or preparing a release |
+| `mycar-release` | Bumping versions, changelog/release notes, tagging, and pushing releases |
 
 Do not add executable hooks or install external skills merely because a document links to them.

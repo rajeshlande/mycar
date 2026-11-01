@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
-import { join, dirname, resolve } from 'node:path';
+import { join, dirname, resolve, basename } from 'node:path';
 
 const errors = [];
 const files = ['AGENTS.md', 'CLAUDE.md', '.claude/README.md'];
@@ -9,7 +9,7 @@ files.push(...skills);
 
 for (const file of files) {
   if (!existsSync(file)) { errors.push(`${file}: missing`); continue; }
-  const text = readFileSync(file, 'utf8');
+  const text = readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
   if (!text.endsWith('\n') || text.endsWith('\n\n')) errors.push(`${file}: expected one final newline`);
   text.split('\n').forEach((line, i) => { if (line.trimEnd() !== line) errors.push(`${file}:${i + 1}: trailing whitespace`); });
   for (const match of text.matchAll(/\[[^\]]+\]\(([^)]+)\)/g)) {
@@ -22,18 +22,18 @@ for (const file of files) {
 
 for (const file of skills) {
   if (!existsSync(file)) continue;
-  const text = readFileSync(file, 'utf8');
+  const text = readFileSync(file, 'utf8').replace(/\r\n/g, '\n');
   const frontmatter = text.match(/^---\n([\s\S]*?)\n---\n/);
   if (!frontmatter) { errors.push(`${file}: missing YAML frontmatter`); continue; }
   const name = frontmatter[1].match(/^name:\s*(.+)$/m)?.[1]?.trim();
   const description = frontmatter[1].match(/^description:\s*(.+)$/m)?.[1]?.trim();
-  const expected = dirname(file).split('/').pop();
+  const expected = basename(dirname(file));
   if (name !== expected) errors.push(`${file}: name must match directory ${expected}`);
   if (!description || description.length > 1024) errors.push(`${file}: missing/overlong description`);
 }
 
 if (!readFileSync('CLAUDE.md', 'utf8').includes('@AGENTS.md')) errors.push('CLAUDE.md: missing @AGENTS.md import');
-for (const path of ['src/lib/supabase.js', 'src/lib/data.jsx', 'supabase/schema.sql', 'public/sw.js', 'vite.config.js', 'docs/VERIFICATION.md', 'tests/database.test.mjs']) {
+for (const path of ['src/lib/supabase.js', 'src/lib/data.jsx', 'supabase/schema.sql', 'public/sw.js', 'vite.config.js', 'docs/VERIFICATION.md', 'tests/database.test.mjs', 'scripts/check-pages.mjs', '.github/workflows/pages.yml', 'scripts/version.mjs', 'CHANGELOG.md', 'docs/VERSIONING.md', 'docs/GITHUB_PUSH.md']) {
   if (!existsSync(path)) errors.push(`missing referenced project path ${path}`);
 }
 

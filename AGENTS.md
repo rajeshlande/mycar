@@ -55,6 +55,7 @@ myCar currently uses **direct Supabase table access protected by RLS and least-p
 6. Run the relevant checks below, inspect results, and review the diff. For UI work, check desktop/mobile, keyboard focus, contrast, and browser console errors.
 7. Update affected docs and verification evidence. Distinguish implemented, verified locally, mocked, proposed, and not-run states.
 8. Report changed files, checks/results, and remaining blockers. Documentation-only changes do not require an application version bump.
+9. `package.json` is the version source of truth. Use `npm run version:check` and the `version:patch|minor|major` scripts; keep `CHANGELOG.md` and the lockfile aligned. Do not tag/push/releases without authorization.
 
 ## Commands
 
@@ -62,12 +63,14 @@ Use Node **20.19+**; CI uses Node 22. Do not invent lint or typecheck scripts th
 
 ```sh
 npm ci
-npm run dev                 # 0.0.0.0:5173
+npm run dev                 # 0.0.0.0; prefers 5173, falls back if busy
 npm test                    # logic/config + SQL/RLS tests in PGlite
 npm run security:check      # browser/public credential and worker-guard scan
 npm run check:agents        # agent docs, skill frontmatter, links, and paths
 npm run build               # production build; relative base
 npm run build:pages         # explicit GitHub Pages-compatible build
+npm run check:pages         # validate dist/ for Pages/PWA hosting
+npm run version:check       # package/lockfile/changelog version alignment
 npm run preview             # production preview on 0.0.0.0:4173
 npm run test:browser        # requires a current build; starts preview + fake Auth server
 ```
@@ -75,8 +78,11 @@ npm run test:browser        # requires a current build; starts preview + fake Au
 First-time browser setup:
 
 ```sh
-npx playwright install --with-deps chromium
+npx playwright install chromium
+# Linux/CI may need: npx playwright install --with-deps chromium
 ```
+
+Keep npm scripts and Playwright server commands cross-platform. Do not use POSIX-only inline environment variables or shell glob expansion in scripts; use Playwright `env` and explicit file paths where needed.
 
 For nested-path/offline checks, build first, then run a managed preview such as:
 
@@ -105,6 +111,7 @@ Use the relevant skill under `.claude/skills/` when the task matches:
 - `mycar-ui` — React pages/components, responsive layout, themes, forms, and accessibility.
 - `mycar-pwa` — manifest, icons, service worker, offline shell, installability, and nested deployment.
 - `mycar-verify` — test selection, browser checks, evidence, and release readiness.
+- `mycar-release` — SemVer bumps, changelog, tags, and GitHub release/push workflow.
 
 These are repository instructions, not globally installed plugins or executable hooks. Do not auto-install third-party skill packs from external links.
 

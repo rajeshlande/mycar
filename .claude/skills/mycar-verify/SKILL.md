@@ -13,8 +13,8 @@ description: Use when selecting tests for a myCar change, reproducing a bug, rev
 | Pure logic | `npm test`; add a focused regression test |
 | Schema/RLS/Auth/data | `npm test`, `npm run security:check`, `npm run build`, `npm run test:browser` |
 | UI/responsive/theme | `npm run build`, `npm run test:browser`, visual/console inspection |
-| PWA/deployment | Build, browser offline checks, root and nested-path smoke test |
-| Release | Relevant checks above, dependency audit, README/verification consistency |
+| PWA/deployment | `npm run build:pages`, `npm run check:pages`, browser offline checks, root and nested-path smoke test |
+| Release | `npm run version:check`, relevant checks above, dependency audit, README/verification consistency; use `mycar-release` for bumps/tags |
 
 ## Rules
 
@@ -33,6 +33,7 @@ npm test
 npm run security:check
 npm run check:agents
 npm run build
+npm run check:pages
 npm run test:browser
 npm audit
 ```

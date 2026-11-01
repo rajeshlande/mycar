@@ -1,7 +1,7 @@
 {
   "name": "mycar",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "type": "module",
   "engines": {
     "node": ">=20.19"
@@ -11,10 +11,15 @@
     "build": "vite build",
     "build:pages": "vite build --base=./",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "node --test tests/*.test.mjs",
+    "test": "node --test tests/logic.test.mjs tests/database.test.mjs",
     "test:browser": "playwright test",
     "security:check": "node scripts/security-check.mjs",
-    "check:agents": "node scripts/check-agent-docs.mjs"
+    "check:agents": "node scripts/check-agent-docs.mjs",
+    "check:pages": "node scripts/check-pages.mjs",
+    "version:check": "node scripts/version.mjs check",
+    "version:patch": "node scripts/version.mjs patch",
+    "version:minor": "node scripts/version.mjs minor",
+    "version:major": "node scripts/version.mjs major"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.2.6",

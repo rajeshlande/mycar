@@ -6,11 +6,13 @@ import { createHash } from 'node:crypto';
 import { isPublicKey, isProjectUrl } from './src/lib/public-config.mjs';
 
 export default defineConfig(({ mode }) => {
+  const pkg = JSON.parse(readFileSync(resolve('package.json'), 'utf8'));
   const env = loadEnv(mode, process.cwd(), 'VITE_');
   if (env.VITE_SUPABASE_URL && !isProjectUrl(env.VITE_SUPABASE_URL)) throw new Error('VITE_SUPABASE_URL must be an HTTPS project URL without credentials, query, or fragment.');
   if (env.VITE_SUPABASE_ANON_KEY && !isPublicKey(env.VITE_SUPABASE_ANON_KEY)) throw new Error('Refusing to bundle a privileged or invalid key. Use a publishable/anon public key only.');
   return {
     base: './',
+    define: { __APP_VERSION__: JSON.stringify(pkg.version) },
     plugins: [react(), {
       name: 'mycar-static-offline-cache',
       apply: 'build',
@@ -22,11 +24,13 @@ export default defineConfig(({ mode }) => {
         const workerPath = resolve(dir, 'sw.js');
         const hash = createHash('sha256').update(Object.keys(bundle).sort().join('|'));
         for (const file of ['sw.js', ...publicFiles]) hash.update(readFileSync(resolve(dir, file)));
-        const version = hash.digest('hex').slice(0, 12);
+        const version = `${pkg.version}-${hash.digest('hex').slice(0, 12)}`;
         writeFileSync(workerPath, readFileSync(workerPath, 'utf8').replace('__BUILD_ID__', version));
       },
     }],
-    server: { host: '0.0.0.0', port: 5173, strictPort: true, allowedHosts: true },
+    // Prefer 5173, but fall back to the next free port for local development.
+    // Preview stays strict so production/browser checks use a known URL.
+    server: { host: '0.0.0.0', port: 5173, strictPort: false, allowedHosts: true },
     preview: { host: '0.0.0.0', port: 4173, strictPort: true, allowedHosts: true },
     build: { chunkSizeWarningLimit: 700 },
   };

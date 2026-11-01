@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative, sep } from 'node:path';
 import { isPublicKey, isProjectUrl } from '../src/lib/public-config.mjs';
 
 const files = [];
@@ -8,11 +8,12 @@ walk('src'); walk('public'); files.push('index.html', 'vite.config.js');
 const failures = [];
 for (const file of files) {
   const text = readFileSync(file, 'utf8');
+  const normalized = relative(process.cwd(), file).split(sep).join('/');
   if (/sb_secret_[A-Za-z0-9_-]{12,}/.test(text)) failures.push(`${file}: possible secret key`);
   for (const token of text.match(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g) || []) {
     try { if (JSON.parse(Buffer.from(token.split('.')[1], 'base64url').toString()).role === 'service_role') failures.push(`${file}: service-role JWT`); } catch {}
   }
-  if (/SUPABASE_SERVICE_ROLE_KEY/.test(text) && file.startsWith('src/')) failures.push(`${file}: administrative key referenced in browser source`);
+  if (/SUPABASE_SERVICE_ROLE_KEY/.test(text) && normalized.startsWith('src/')) failures.push(`${file}: administrative key referenced in browser source`);
 }
 if (existsSync('.env.local')) {
   const text = readFileSync('.env.local', 'utf8');
