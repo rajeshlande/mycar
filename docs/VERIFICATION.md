@@ -113,4 +113,4 @@ These checks do not verify a live Supabase project or successful GitHub Pages de
 
 ## Pages deployment rerun fix — 2026-11-02
 
-The failed deployment run `41338102553` had two successful build attempts, each uploading an artifact named `github-pages`. The deploy action therefore found two same-name artifacts and stopped. The Pages workflow now names the artifact with `github.run_attempt` and configures the deploy action to select that exact attempt's artifact. A successful hosted deployment still requires a subsequent GitHub Actions run; this local change does not itself verify deployment.
+The failed deployment run `41338102553` had two successful build attempts, each uploading an artifact named `github-pages`. The deploy action therefore found two same-name artifacts and stopped. The Pages workflow now names the artifact with `github.run_attempt` and configures the deploy action to select that exact attempt's artifact. The fix was pushed in commit `b372763`; GitHub Actions run `41338907045` completed successfully, including the Pages deployment.
