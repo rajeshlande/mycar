@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "myCar — Your personal garage",
+  "short_name": "myCar",
+  "description": "Track vehicle expenses, plan your budget, and keep a little care on the road ahead.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f8f5",
+  "theme_color": "#2d6b4d",
+  "orientation": "any",
+  "lang": "en",
+  "categories": ["finance", "productivity", "lifestyle"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
