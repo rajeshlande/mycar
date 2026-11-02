@@ -44,6 +44,15 @@ create table if not exists public.vehicles (
   updated_at timestamptz not null default now(),
   unique (id, user_id)
 );
+-- Non-destructive upgrade for existing v1 installations: allow more body types
+-- and a bounded custom powertrain name while retaining all existing values.
+alter table public.vehicles drop constraint if exists vehicles_fuel_type_check;
+alter table public.vehicles add constraint vehicles_fuel_type_check
+  check (char_length(trim(fuel_type)) between 1 and 50);
+alter table public.vehicles drop constraint if exists vehicles_body_type_check;
+alter table public.vehicles add constraint vehicles_body_type_check
+  check (body_type in ('SUV','Hatchback','Sedan','MPV','MUV','Crossover','Coupe','Convertible','Wagon','Pickup','Van','Motorcycle','Scooter','Moped','Other'));
+
 create unique index if not exists vehicles_one_primary_per_user on public.vehicles(user_id) where is_primary;
 create unique index if not exists vehicles_registration_per_user on public.vehicles(user_id, upper(regexp_replace(registration, '\s+', '', 'g'))) where registration <> '';
 create index if not exists vehicles_user_idx on public.vehicles(user_id);

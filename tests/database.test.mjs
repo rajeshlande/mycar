@@ -104,3 +104,33 @@ test('primary switching is atomic, owner-scoped, and vehicle deletion cascades',
     assert.equal((await db.query('select * from expenses where vehicle_id=$1', [v2])).rows.length, 0);
   } finally { await db.close(); }
 });
+
+test('expanded vehicle and custom fuel types preserve owner isolation', async () => {
+  const db = await database();
+  try {
+    await db.exec(sql); // repeat the non-destructive upgrade
+    for (const [body, fuel] of [['Motorcycle', 'Petrol'], ['Scooter', 'Electric'], ['Moped', 'Petrol + CNG'], ['Crossover', 'Custom biofuel']]) {
+      const row = await asUser(db, USER1, tx => tx.query('insert into vehicles(name,body_type,fuel_type) values ($1,$2,$3) returning id,body_type,fuel_type', [body, body, fuel]));
+      assert.equal(row.rows[0].fuel_type, fuel);
+      assert.equal((await asUser(db, USER2, tx => tx.query('select id from vehicles where id=$1', [row.rows[0].id]))).rows.length, 0);
+    }
+    await assert.rejects(() => asUser(db, USER1, tx => tx.query("insert into vehicles(name, fuel_type) values ('Bad','  ')")), e => e.code === '23514');
+    await assert.rejects(() => asUser(db, USER1, tx => tx.query('insert into vehicles(name, fuel_type) values ($1,$2)', ['Bad', 'x'.repeat(51)])), e => e.code === '23514');
+  } finally { await db.close(); }
+});
+
+test('existing v1 vehicles survive the vehicle type upgrade', async () => {
+  const db = new PGlite();
+  try {
+    await db.exec(`create schema auth; create table auth.users(id uuid primary key, raw_user_meta_data jsonb default '{}'); create role anon nologin; create role authenticated nologin; create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;`);
+    const before = sql.replace(/-- Non-destructive upgrade for existing v1 installations:[\s\S]*?(?=create unique index if not exists vehicles_one_primary_per_user)/, '');
+    assert.notEqual(before, sql);
+    await db.exec(before);
+    await db.query('insert into auth.users(id) values ($1)', [USER1]);
+    const saved = await asUser(db, USER1, tx => tx.query("insert into vehicles(name,body_type,fuel_type) values ('Existing car','SUV','Petrol') returning id"));
+    await db.exec(sql);
+    const row = await asUser(db, USER1, tx => tx.query('select name,body_type,fuel_type from vehicles where id=$1', [saved.rows[0].id]));
+    assert.deepEqual(row.rows[0], { name: 'Existing car', body_type: 'SUV', fuel_type: 'Petrol' });
+    await asUser(db, USER1, tx => tx.query("update vehicles set body_type='Scooter', fuel_type='LPG' where id=$1", [saved.rows[0].id]));
+  } finally { await db.close(); }
+});

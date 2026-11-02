@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { CarFront, X, Check, AlertCircle, Info, Fuel, Wrench, ShieldCheck, SquareParking, Route, Receipt, ArrowUpRight, LoaderCircle, CalendarDays, ChevronLeft, ChevronRight, SearchX, Car, Plus } from 'lucide-react';
+import { CarFront, X, Check, AlertCircle, Info, Fuel, Wrench, ShieldCheck, SquareParking, Route, Receipt, ArrowUpRight, LoaderCircle, CalendarDays, ChevronLeft, ChevronRight, SearchX, Car, Plus, Bike } from 'lucide-react';
 import { categoryFor, currentMonth, initials, shiftMonth } from '../lib/logic.mjs';
 
 const ToastContext = createContext(null);
@@ -76,6 +76,12 @@ export function ConfirmDialog({ title, description, label = 'Delete', onConfirm,
 export function CarArt({ color = 'silver', className = '' }) {
   const paint = { silver: '#bec9c5', white: '#f2f1e9', black: '#43524b', blue: '#789ab6', red: '#b86e64', green: '#70937b' }[color] || '#bec9c5';
   return <svg className={`car-art ${className}`} viewBox="0 0 420 180" fill="none" aria-hidden="true"><ellipse cx="214" cy="149" rx="165" ry="12" fill="currentColor" opacity=".08"/><path d="M65 104 89 91l45-51c7-8 17-12 28-12h91c12 0 24 5 32 15l39 47 35 12c10 4 16 13 16 24v14H49v-17c0-9 6-16 16-19Z" fill={paint}/><path d="m145 43-34 44h88V40h-36c-7 0-13 1-18 3Zm66-3v47h91l-35-42c-3-3-7-5-12-5h-44Z" fill="#24483d" opacity=".85"/><path d="M53 124h318M103 95h218" stroke="#fff" strokeOpacity=".35" strokeWidth="3"/><path d="M207 94v40M310 96l9 28" stroke="#24483d" strokeOpacity=".25" strokeWidth="2"/><rect x="224" y="98" width="18" height="4" rx="2" fill="#24483d" opacity=".5"/><rect x="121" y="98" width="18" height="4" rx="2" fill="#24483d" opacity=".5"/><path d="M52 111h29l-5 12H50M348 108h20l5 13h-25" fill="#f7e9b5"/><circle cx="114" cy="138" r="28" fill="#263b32"/><circle cx="114" cy="138" r="16" fill="#91a29a"/><circle cx="114" cy="138" r="7" fill="#d8dfda"/><circle cx="316" cy="138" r="28" fill="#263b32"/><circle cx="316" cy="138" r="16" fill="#91a29a"/><circle cx="316" cy="138" r="7" fill="#d8dfda"/><path d="M198 39v48" stroke="#fff" strokeOpacity=".3" strokeWidth="2"/></svg>;
+}
+export function VehicleArt({ vehicle, className = '' }) {
+  if (['Motorcycle', 'Scooter', 'Moped'].includes(vehicle.body_type)) {
+    return <Bike className={`car-art ${className}`} aria-hidden="true" strokeWidth={1.1}/>;
+  }
+  return <CarArt color={vehicle.color} className={className}/>;
 }
 export function useOnline() { const [online, setOnline] = useState(navigator.onLine); useEffect(() => { const update = () => setOnline(navigator.onLine); window.addEventListener('online', update); window.addEventListener('offline', update); return () => { window.removeEventListener('online', update); window.removeEventListener('offline', update); }; }, []); return online; }
 export function downloadFile(name, content, type = 'text/csv;charset=utf-8') { const url = URL.createObjectURL(new Blob([content], { type })); const link = document.createElement('a'); link.href = url; link.download = name; document.body.appendChild(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000); }

@@ -137,6 +137,24 @@ test('mobile navigation and all pages fit the viewport', async ({ page }) => {
   await expect(page.getByRole('dialog')).toBeVisible();
   await page.getByRole('button', { name: 'Close dialog' }).click();
 });
+test('mobile editable fields and navigation have usable sizing', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/login');
+  for (const name of ['Email address', 'Password']) {
+    const input = page.getByLabel(name, { exact: false }).first();
+    await expect(input).toHaveCSS('font-size', '16px');
+  }
+  await enterSample(page);
+  const menu = page.getByRole('button', { name: 'Open navigation' });
+  const size = await menu.boundingBox();
+  expect(size.width).toBeGreaterThanOrEqual(44);
+  expect(size.height).toBeGreaterThanOrEqual(44);
+  await page.getByRole('button', { name: 'Add expense', exact: true }).last().click();
+  await expect(page.getByRole('dialog').getByLabel('Description')).toHaveCSS('font-size', '16px');
+  const widths = await page.evaluate(() => ({ viewport: innerWidth, document: document.documentElement.scrollWidth }));
+  expect(widths.document).toBeLessThanOrEqual(widths.viewport);
+});
+
 test('offline shell is cached without caching API data', async ({ page, context }) => {
   await enterSample(page);
   await page.evaluate(async () => { await navigator.serviceWorker.ready; });
@@ -170,4 +188,29 @@ test('main screens and dialogs pass automated WCAG A/AA checks in both themes', 
   for (const route of ['dashboard', 'expenses', 'vehicles', 'profile', 'settings']) {
     await page.goto(`/#/${route}`); await scan(`dark ${route}`);
   }
+});
+
+test('add motorcycle and scooter with custom make, model and fuel', async ({ page }) => {
+  await enterSample(page);
+  await page.getByRole('link', { name: /My vehicles/ }).click();
+  for (const item of [
+    { name: 'My bike', make: 'Custom Indian make', model: 'Custom model', body: 'Motorcycle', fuel: 'Petrol + CNG' },
+    { name: 'My scooter', make: 'Ather', model: 'Rizta', body: 'Scooter', fuel: 'Custom biofuel' },
+  ]) {
+    await page.getByRole('button', { name: 'Add vehicle', exact: true }).click();
+    const dialog = page.getByRole('dialog');
+    await dialog.getByLabel('Vehicle nickname').fill(item.name);
+    await dialog.getByLabel('Make', { exact: true }).fill(item.make);
+    await dialog.getByLabel('Model', { exact: true }).fill(item.model);
+    await dialog.getByLabel('Body type').selectOption(item.body);
+    await dialog.getByLabel('Fuel type').fill(item.fuel);
+    await dialog.getByRole('button', { name: 'Add vehicle', exact: true }).click();
+    await expect(dialog).toHaveCount(0);
+    const card = page.locator('.vehicle-card').filter({ has: page.getByRole('heading', { name: item.name, exact: true }) });
+    await expect(card).toContainText(item.model);
+    await expect(card).toContainText(item.fuel);
+  }
+  await page.getByLabel('Filter vehicles by fuel type').selectOption('Custom biofuel');
+  await expect(page.locator('.vehicle-card')).toHaveCount(1);
+  await expect(page.locator('.vehicle-card')).toContainText('My scooter');
 });

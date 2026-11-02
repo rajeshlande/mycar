@@ -4,6 +4,18 @@ All notable changes to myCar are documented here. The format follows Keep a Chan
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-11-02
+
+### Added
+
+- Cars, motorcycles, scooters and mopeds with expanded body-type choices, India-focused make/model suggestions and custom make/model entry.
+- Additional fuel and powertrain suggestions including LPG, dual fuel, hybrids, hydrogen and flexible custom values. The fuel filter includes custom entries.
+
+### Changed
+
+- Mobile text inputs and navigation controls have larger sizing; real-device validation is still required.
+- Existing Supabase projects must run the updated schema SQL before saving the new body or fuel types.
+
 ## [1.1.2] - 2026-11-02
 
 ### Fixed

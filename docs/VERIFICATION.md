@@ -157,3 +157,9 @@ Reproduced locally by building with simulated publishable credentials, which fai
 | `npm audit` | 0 vulnerabilities |
 
 Live Supabase authentication, real email delivery, and real-device PWA install remain owner-verified items. The simulated credentials used above are fictional and were never a real project.
+
+## Vehicle and fuel support — v1.2.0
+
+Local development verification: 16 logic/database tests, including a simulated upgrade of the original v1 schema preserving an existing vehicle and testing owner isolation; browser suite covers custom make/model, motorcycle and scooter creation, custom fuel and fuel filtering. At v1.2.0, 13/13 browser tests passed in Chromium with retries disabled against both simulated configured and unconfigured builds; check:pages, security, agents and version checks also passed. Mobile field/nav changes are included from the prior draft; automated tests cannot establish actual iOS/Android behavior. Make/model suggestions are illustrative, not exhaustive or current market coverage.
+
+Existing Supabase installations need the updated `supabase/schema.sql` applied before the app version is deployed; no live migration has been performed. Test real devices, real signup/email and hosted database behavior independently.

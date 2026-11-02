@@ -282,3 +282,9 @@ scripts/            Public-credential security check
 ## License
 
 MIT. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
+### Vehicle types and fuel
+
+myCar supports car body styles, motorcycles, scooters and mopeds. Make and model suggestions are a convenience, not an exhaustive or continuously updated catalogue: type any make and model, including imported or discontinued vehicles. Choose a suggested fuel or powertrain, or enter a custom value (up to 50 characters).
+
+**Existing Supabase projects:** Before deploying this app version, back up your project and run the updated `supabase/schema.sql` in the Supabase SQL Editor. Its vehicle constraint upgrade preserves existing rows and is idempotent for the standard v1 schema. Custom database constraints may require an independently reviewed migration. Until the SQL upgrade is applied, existing database constraints reject new body/fuel types. Never put privileged keys in the app.

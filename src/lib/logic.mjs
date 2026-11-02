@@ -7,8 +7,8 @@ export const CATEGORIES = [
   { id: 'other', label: 'Other', color: '#a6b4ad', tint: '#eff2f0', icon: 'Receipt' },
 ];
 export const categoryFor = id => CATEGORIES.find(c => c.id === id) || CATEGORIES.at(-1);
-export const FUEL_TYPES = ['Petrol', 'Diesel', 'CNG', 'Electric', 'Hybrid'];
-export const BODY_TYPES = ['SUV', 'Hatchback', 'Sedan', 'MPV', 'Other'];
+export const FUEL_TYPES = ['Petrol', 'Diesel', 'CNG', 'LPG', 'Electric', 'Hybrid', 'Petrol + CNG', 'Petrol + LPG', 'Petrol hybrid', 'Diesel hybrid', 'Plug-in hybrid', 'Hydrogen', 'Ethanol / flex fuel', 'Other'];
+export const BODY_TYPES = ['SUV', 'Hatchback', 'Sedan', 'MPV', 'MUV', 'Crossover', 'Coupe', 'Convertible', 'Wagon', 'Pickup', 'Van', 'Motorcycle', 'Scooter', 'Moped', 'Other'];
 export const VEHICLE_COLORS = [
   { id: 'silver', label: 'Silver', hex: '#b8c2c0' },
   { id: 'white', label: 'White', hex: '#f4f3ec' },
