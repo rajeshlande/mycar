@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useId, useRef, useState } from 'react';
+import { createContext, useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { CarFront, X, Check, AlertCircle, Info, Fuel, Wrench, ShieldCheck, SquareParking, Route, Receipt, ArrowUpRight, LoaderCircle, CalendarDays, ChevronLeft, ChevronRight, SearchX, Car, Plus } from 'lucide-react';
 import { categoryFor, currentMonth, initials, shiftMonth } from '../lib/logic.mjs';
@@ -40,16 +40,19 @@ export function MonthPicker({ value, onChange, allowAll = false }) { return <div
 export function Modal({ title, subtitle, children, onClose, busy = false, wide = false, className = '' }) {
   const titleId = useId();
   const ref = useRef(null);
+  const previousFocus = useRef(null);
   const closeRef = useRef(onClose); closeRef.current = onClose;
   const busyRef = useRef(busy); busyRef.current = busy;
+  useLayoutEffect(() => {
+    previousFocus.current = document.activeElement;
+    const first = ref.current?.querySelector('[data-autofocus]') || ref.current?.querySelector('input:not([type="hidden"]), select, textarea') || ref.current?.querySelector('button');
+    (first || ref.current)?.focus();
+    // Restore before a replacement dialog mounts, so an old dialog cannot steal its focus.
+    return () => { if (previousFocus.current?.isConnected) previousFocus.current.focus(); };
+  }, []);
   useEffect(() => {
-    const previous = document.activeElement;
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    const timer = setTimeout(() => {
-      const first = ref.current?.querySelector('[data-autofocus]') || ref.current?.querySelector('input:not([type="hidden"]), select, textarea') || ref.current?.querySelector('button');
-      (first || ref.current)?.focus();
-    }, 60);
     const keydown = e => {
       if (e.key === 'Escape' && !busyRef.current) closeRef.current();
       if (e.key !== 'Tab') return;
@@ -60,7 +63,7 @@ export function Modal({ title, subtitle, children, onClose, busy = false, wide =
       else if (!e.shiftKey && (document.activeElement === last || !ref.current?.contains(document.activeElement))) { e.preventDefault(); first.focus(); }
     };
     document.addEventListener('keydown', keydown);
-    return () => { clearTimeout(timer); document.body.style.overflow = overflow; document.removeEventListener('keydown', keydown); if (previous?.isConnected) previous.focus(); };
+    return () => { document.body.style.overflow = overflow; document.removeEventListener('keydown', keydown); };
   }, []);
   return createPortal(<div className="modal-backdrop" onMouseDown={e => { if (e.target === e.currentTarget && !busy) onClose(); }}><section ref={ref} className={`modal ${wide ? 'wide' : ''} ${className}`} role="dialog" aria-modal="true" aria-labelledby={titleId} tabIndex={-1}><header className="modal-header"><div><h2 id={titleId}>{title}</h2>{subtitle && <p>{subtitle}</p>}</div><button className="icon-button" aria-label="Close dialog" onClick={onClose} disabled={busy}><X size={21}/></button></header>{children}</section></div>, document.body);
 }

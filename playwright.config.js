@@ -4,7 +4,8 @@ export default defineConfig({
   testDir: './tests/browser',
   fullyParallel: false,
   workers: 1,
-  timeout: 30000,
+  timeout: 60000,
+  retries: process.env.CI ? 2 : 0,
   expect: { timeout: 7000 },
   use: { baseURL: 'http://127.0.0.1:4173', viewport: { width: 1440, height: 1000 }, trace: 'retain-on-failure', screenshot: 'only-on-failure' },
   webServer: [

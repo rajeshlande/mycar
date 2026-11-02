@@ -4,6 +4,18 @@ All notable changes to myCar are documented here. The format follows Keep a Chan
 
 ## [Unreleased]
 
+## [1.1.1] - 2026-11-02
+
+### Fixed
+
+- Modal autofocus no longer steals focus during fast input. This fixes both expense text being inserted into the amount field (leaving the required description empty) and vehicle nickname/model corruption.
+- Focus restoration happens before a replacement dialog mounts, so a closing editor cannot steal focus from its confirmation dialog.
+
+### Changed
+
+- Playwright uses CI-only retries and a longer test timeout; the Pages workflow uploads browser-test diagnostics on failure.
+- Expense and vehicle browser tests scope inputs to their dialogs, verify field values before saving, and assert successful dialog closure. Regression checks cover delayed focus theft and focus restoration.
+
 ## [1.1.0] - 2026-11-01
 
 ### Added

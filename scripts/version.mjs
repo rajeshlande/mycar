@@ -60,7 +60,8 @@ function bump(type) {
   const unreleased = changelog.match(/## \[Unreleased\][^\n]*\n([\s\S]*?)(?=\n## \[|$)/);
   if (!unreleased) fail('CHANGELOG.md must keep an [Unreleased] section to release.');
   const notes = unreleased[1].trim() || '### Changed\n- Maintenance release.';
-  const date = new Date().toISOString().slice(0, 10);
+  const now = new Date();
+  const date = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
 
   pkg.version = next;
   lock.version = next;
