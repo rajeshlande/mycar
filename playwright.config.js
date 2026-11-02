@@ -20,6 +20,18 @@ export default defineConfig({
       reuseExistingServer: false,
       timeout: 30000,
     },
+    {
+      // Guaranteed-unconfigured server. The production preview on 4173 reflects
+      // whatever VITE_SUPABASE_* values the build received, so it cannot be used
+      // to assert setup-mode behaviour once repository secrets exist. Blanking
+      // the variables here also overrides a developer's local .env.local,
+      // because Vite's loadEnv gives process.env the final word.
+      command: 'npm run dev -- --port 5175 --strictPort',
+      env: { VITE_SUPABASE_URL: '', VITE_SUPABASE_ANON_KEY: '' },
+      url: 'http://127.0.0.1:5175',
+      reuseExistingServer: false,
+      timeout: 30000,
+    },
   ],
   reporter: [['list']],
 });

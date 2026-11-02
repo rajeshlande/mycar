@@ -4,6 +4,16 @@ All notable changes to myCar are documented here. The format follows Keep a Chan
 
 ## [Unreleased]
 
+## [1.1.2] - 2026-11-02
+
+### Fixed
+
+- The setup-mode browser test no longer depends on the production build being unconfigured. It runs against a dedicated always-unconfigured server on port 5175, so adding `VITE_SUPABASE_URL`/`VITE_SUPABASE_ANON_KEY` repository secrets no longer breaks CI.
+
+### Changed
+
+- The production-preview browser suite blocks all non-local network requests, so CI can never send test credentials to a real Supabase project.
+
 ## [1.1.1] - 2026-11-02
 
 ### Fixed

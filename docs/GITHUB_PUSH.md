@@ -45,7 +45,7 @@ npx playwright install chromium
 
 ```powershell
 git add .
-git commit -m "Release v1.1.1: fix expense and vehicle dialog focus races"
+git commit -m "Release v1.1.2: decouple setup-mode test from build-time Supabase secrets"
 git push origin main
 ```
 
@@ -56,20 +56,20 @@ If Git says there is nothing to commit, the files are already committed; continu
 Check whether the tag already exists:
 
 ```powershell
-git tag -l v1.1.1
+git tag -l v1.1.2
 ```
 
 If it does not exist:
 
 ```powershell
-git tag -a v1.1.1 -m "myCar v1.1.1"
-git push origin v1.1.1
+git tag -a v1.1.2 -m "myCar v1.1.2"
+git push origin v1.1.2
 ```
 
 Optional GitHub CLI release:
 
 ```powershell
-gh release create v1.1.1 --title "myCar v1.1.1" --generate-notes
+gh release create v1.1.2 --title "myCar v1.1.2" --generate-notes
 ```
 
 ## 5. Enable GitHub Pages

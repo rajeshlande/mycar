@@ -10,9 +10,9 @@ Environment: Node.js 20.20.2, npm 10.8.2, Chromium via Playwright, PGlite 0.5.x.
 | `npm test` | **14 passed**: 8 logic/config tests and 6 PostgreSQL schema/RLS tests |
 | `npm run security:check` | Passed; 28 browser/public files checked, no privileged credentials found, static-only worker guards present |
 | `npm run check:agents` | Passed; 8 agent/skill Markdown files, 5 skill frontmatters, local links, Claude import, and referenced project paths validated |
-| `npm run version:check` | Passed; package.json, package-lock.json, and CHANGELOG.md aligned at v1.1.1 |
-| `npm run build:pages` and `npm run check:pages` | Passed; relative-base production assets and Pages/PWA output validated |
-| `npm run test:browser` | **11 passed** with `CI=1` and retries disabled; focused expense/vehicle tests also passed **20 runs each** with retries disabled |
+| `npm run version:check` | Passed; package.json, package-lock.json, and CHANGELOG.md aligned at v1.1.2 |
+| `npm run build:pages` and `npm run check:pages` | Passed; relative-base production assets and Pages/PWA output validated, with and without Supabase build-time variables |
+| `npm run test:browser` | **11 passed** with `CI=1` and retries disabled against **both** a configured and an unconfigured production build; focused expense/vehicle tests also passed **20 runs each**, and the setup-mode test passed **12 consecutive runs** on a configured build |
 | `npm audit --omit=dev` | 0 vulnerabilities reported at verification time |
 
 ### Database coverage
@@ -33,7 +33,7 @@ PGlite exercises real PostgreSQL semantics locally, but is **not** a hosted Supa
 
 ### Browser coverage
 
-- Honest unconfigured sign-in and reachable setup guide.
+- Honest unconfigured sign-in and reachable setup guide, asserted on the dedicated always-unconfigured server (5175) so build-time secrets cannot change the result.
 - Sample dashboard vehicle filtering.
 - Expense create/edit/delete and filtered CSV download, with dialog-scoped inputs and pre-submit value assertions.
 - Vehicle creation and explicit cascade-deletion confirmation, with exact card selection and model persistence checks.
@@ -133,3 +133,27 @@ These checks do not verify a live Supabase project or successful GitHub Pages de
 ## Pages deployment rerun fix — 2026-11-02
 
 The failed deployment run `41338102553` had two successful build attempts, each uploading an artifact named `github-pages`. The deploy action therefore found two same-name artifacts and stopped. The Pages workflow now names the artifact with `github.run_attempt` and configures the deploy action to select that exact attempt's artifact. The fix was pushed in commit `b372763`; GitHub Actions run `41338907045` completed successfully, including the Pages deployment.
+
+## Supabase-secrets CI fix — 2026-11-02 (v1.1.2)
+
+After the owner added `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` repository secrets, Pages run `41403762885` attempt 2 failed on `unconfigured authentication is honest and setup is reachable`. Attempt 1, built before the secrets existed, had passed.
+
+Cause: the test asserted setup-mode behaviour against the production preview on port 4173. That preview is built with whatever `VITE_SUPABASE_*` values CI supplies, so once secrets existed it became a *configured* app. Sign-in then reached the real project and returned `That email and password don’t match.` instead of the setup notice. The app behaved correctly; the test was coupled to build configuration. It also meant CI was submitting test credentials to a live Supabase project.
+
+Fix: setup-mode assertions now run against a dedicated always-unconfigured dev server on port 5175, whose `VITE_SUPABASE_*` variables are explicitly blanked in `playwright.config.js`. Vite's `loadEnv` gives `process.env` precedence over `.env` files, so this also holds for a developer with a populated `.env.local`. The production-preview suite additionally aborts every non-local request, so it can never authenticate against a real project.
+
+Reproduced locally by building with simulated publishable credentials, which failed the same assertion, then re-ran after the fix.
+
+| Check | Result |
+|---|---|
+| `npm run version:check` | Passed at v1.1.2 |
+| `npm run security:check` | Passed; 28 browser/public files |
+| `npm run check:agents` | Passed; 8 Markdown files, 5 skills |
+| `npm test` | 14/14 passed |
+| `npm run build:pages` + `npm run check:pages` | Passed in both configured and unconfigured modes |
+| `npm run test:browser` (configured build) | 11/11 passed, `CI=1 --retries=0` |
+| `npm run test:browser` (unconfigured build) | 11/11 passed, `CI=1 --retries=0` |
+| Setup-mode test on configured build | 12/12 consecutive runs passed, retries disabled |
+| `npm audit` | 0 vulnerabilities |
+
+Live Supabase authentication, real email delivery, and real-device PWA install remain owner-verified items. The simulated credentials used above are fictional and were never a real project.

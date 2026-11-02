@@ -21,7 +21,7 @@ description: Use when selecting tests for a myCar change, reproducing a bug, rev
 1. Read `AGENTS.md`, inspect Git status, and identify acceptance criteria before running checks.
 2. Reproduce bugs with a failing check where feasible. Do not weaken a test merely to make it pass.
 3. Build before browser tests; the production suite serves `dist`.
-4. Keep fake Supabase credentials/JWTs confined to tests. Never substitute them for live-project acceptance.
+4. Keep fake Supabase credentials/JWTs confined to tests. Never substitute them for live-project acceptance. The preview on 4173 inherits build-time `VITE_SUPABASE_*`, so assert setup-mode behaviour on the always-unconfigured server (5175), never on the preview. Keep the preview suite's non-local network block in place so CI cannot reach a live project.
 5. Distinguish PGlite SQL tests from hosted Supabase tests, and mocked Auth from real email delivery.
 6. Do not mark live SMTP, redirect allow-list, real-device install, backups, or production deployment as verified without evidence.
 7. Update `docs/VERIFICATION.md` with commands actually run, results, environment, and remaining owner checks.

@@ -72,7 +72,7 @@ npm run build:pages         # explicit GitHub Pages-compatible build
 npm run check:pages         # validate dist/ for Pages/PWA hosting
 npm run version:check       # package/lockfile/changelog version alignment
 npm run preview             # production preview on 0.0.0.0:4173
-npm run test:browser        # requires a current build; starts preview + fake Auth server
+npm run test:browser        # requires a current build; preview 4173 + fake Auth 5174 + unconfigured 5175
 ```
 
 First-time browser setup:

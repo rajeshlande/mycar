@@ -1,6 +1,17 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+// This suite runs against the production preview, which is built with whatever
+// VITE_SUPABASE_* values CI provides. Once repository secrets exist the preview
+// is a configured app, so it must never be used to assert setup-mode behaviour
+// and must never reach a real Supabase project.
+const SETUP_APP = 'http://127.0.0.1:5175';
+
+// Fail loudly rather than silently authenticating against a live project.
+test.beforeEach(async ({ page }) => {
+  await page.route(/^https?:\/\/(?!127\.0\.0\.1|localhost)/, route => route.abort('blockedbyclient'));
+});
+
 async function enterSample(page) {
   await page.goto('/');
   await page.getByRole('button', { name: 'Explore a sample workspace' }).click();
@@ -9,8 +20,10 @@ async function enterSample(page) {
 
 test('unconfigured authentication is honest and setup is reachable', async ({ page }) => {
   const errors = []; page.on('pageerror', e => errors.push(e.message));
-  await page.goto('/#/login');
+  // Dedicated always-unconfigured server, independent of build-time secrets.
+  await page.goto(`${SETUP_APP}/#/login`);
   await expect(page.getByRole('heading', { name: 'Welcome back.' })).toBeVisible();
+  await expect(page.locator('.connection-note')).toContainText('Accounts aren’t connected yet');
   await page.getByLabel('Email address').fill('test@example.com');
   await page.getByLabel('Password', { exact: false }).first().fill('not-a-real-password');
   await page.getByRole('button', { name: 'Sign in to myCar' }).click();

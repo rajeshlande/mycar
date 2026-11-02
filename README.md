@@ -147,7 +147,9 @@ npx playwright install chromium
 npm run test:browser
 ```
 
-The browser suite starts a production preview on port 4173 and a separate, fake-configured development server on port 5174. All Supabase requests in authentication tests are intercepted. No real credentials or mailbox are needed. The Playwright server environment is configured in `playwright.config.js`, so the command works on Windows, macOS, and Linux.
+The browser suite starts three servers: a production preview on port 4173, a fake-configured development server on port 5174 for intercepted Auth contract tests, and an always-unconfigured development server on port 5175 for setup-mode checks. All Supabase requests in authentication tests are intercepted, and the production-preview suite blocks non-local network access so it can never authenticate against a real project. No real credentials or mailbox are needed.
+
+The preview on 4173 is built with whatever `VITE_SUPABASE_*` values are present, so it may be configured or unconfigured. Setup-mode assertions use port 5175 instead, which keeps the suite green both before and after you add repository secrets. The Playwright server environment is configured in `playwright.config.js`, so the command works on Windows, macOS, and Linux.
 
 Executed checks and remaining live-project checks are recorded in [`docs/VERIFICATION.md`](docs/VERIFICATION.md).
 
