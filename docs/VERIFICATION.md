@@ -171,3 +171,7 @@ Local verification: 17/17 logic and PGlite database tests passed, including a si
 ## RuPay credit card via UPI — v1.3.1
 
 Local verification: 18/18 logic and PGlite tests passed, including an upgrade from the v1.3 payment constraint, preservation of existing UPI entries, repeat application and cross-user isolation. Production Pages build and check passed; 14/14 Chromium browser tests passed with retries disabled, including saving, editing, displaying and CSV-exporting the new payment label. Security and agent checks passed. Update the canonical `supabase/schema.sql` before deploying; no live migration was performed.
+
+## Mobile navigation refresh — v1.4.0
+
+Local verification: 18/18 logic/database tests; 16/16 Chromium browser tests with retries disabled against both unconfigured and simulated-configured builds; version, security, agent, Pages checks passed. Added tests for bottom navigation and 320px overflow; manually checked dashboard widths 320, 360, 390, 768, 844 landscape and 1440px and the four quick-navigation pages at 320px. A mobile dashboard axe check at 390px reported zero WCAG A/AA violations in each theme. These are emulated browser checks, not real-device or complete accessibility testing. Real iOS Safari and Android Chrome, keyboard overlay, safe-area insets, orientation and screen readers remain to be verified. No schema or live project changes are required for this UI-only release.

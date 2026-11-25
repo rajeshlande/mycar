@@ -4,6 +4,12 @@ All notable changes to myCar are documented here. The format follows Keep a Chan
 
 ## [Unreleased]
 
+## [1.4.0] - 2026-11-25
+
+### Changed
+
+- Refreshed mobile layout with a bottom quick-navigation bar, clearer controls and safer spacing for phone screens. Desktop navigation remains unchanged.
+
 ## [1.3.1] - 2026-11-25
 
 ### Added

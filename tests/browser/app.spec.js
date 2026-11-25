@@ -241,3 +241,30 @@ test('payment method can be saved, edited and exported for an expense', async ({
   let csv = ''; for await (const chunk of stream) csv += chunk.toString();
   expect(csv).toContain('Payment method'); expect(csv).toContain('RuPay credit card via UPI');
 });
+
+test('mobile quick navigation works without covering content', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await enterSample(page);
+  const nav = page.getByRole('navigation', { name: 'Quick navigation' });
+  await expect(nav).toBeVisible();
+  for (const [link, heading] of [['Spending', 'The expense log.'], ['Garage', 'Meet your garage.'], ['Account', 'Make yourself at home.'], ['Home', 'Your garage, at a glance.']]) {
+    await nav.getByRole('link', { name: link }).click();
+    await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+  }
+  await page.getByRole('button', { name: 'Add expense', exact: true }).last().click();
+  await expect(page.getByRole('dialog').getByLabel('Payment method')).toBeVisible();
+  await page.getByRole('button', { name: 'Close dialog' }).click();
+});
+
+test('narrow mobile quick navigation stays within viewport', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 640 });
+  await enterSample(page);
+  const nav = page.getByRole('navigation', { name: 'Quick navigation' });
+  for (const name of ['Home', 'Spending', 'Garage', 'Account']) {
+    await nav.getByRole('link', { name }).click();
+    await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  }
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(nav).toBeHidden();
+});

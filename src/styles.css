@@ -51,4 +51,36 @@
     .breadcrumb .icon-button.mobile-only,
     .sidebar-brand .icon-button.mobile-only { width: 44px; height: 44px; }
   }
+
+  /* Mobile-first touch navigation and calmer surfaces, inspired by the reference.
+     Desktop sidebar and layout remain unchanged. */
+  .mobile-primary-nav { display: none; }
+  @media (max-width: 350px) {
+    .dashboard-filters { flex-wrap: wrap; }
+  }
+  @media (max-width: 700px) {
+    .mobile-primary-nav { position: fixed; z-index: 42; bottom: 0; left: 0; right: 0; display: grid; grid-template-columns: repeat(4, 1fr); min-height: 68px; padding: 5px 10px max(5px, env(safe-area-inset-bottom)); background: var(--surface); border-top: 1px solid var(--line); box-shadow: 0 -5px 22px #1d352014; }
+    .mobile-primary-nav a { display: flex; min-height: 52px; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--muted-strong); font-size: 10px; font-weight: 650; }
+    .mobile-primary-nav a.active { color: var(--green); }
+    .mobile-primary-nav a.active svg { stroke-width: 2.4; }
+    .mobile-add { bottom: calc(82px + env(safe-area-inset-bottom)); right: max(18px, env(safe-area-inset-right)); width: 52px; height: 52px; border-radius: 18px; }
+    .workspace { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+    .main-content { padding-left: max(18px, env(safe-area-inset-left)); padding-right: max(18px, env(safe-area-inset-right)); }
+    .topbar { padding-left: max(16px, env(safe-area-inset-left)); padding-right: max(16px, env(safe-area-inset-right)); }
+    .app-footer { padding-bottom: 20px; }
+    .panel, .stat-card { border-radius: 16px; }
+    .page-heading p, .auth-form-heading p { font-size: 13px; line-height: 1.55; }
+    .field > label, .field > div > label, .auth-form .field > label { font-size: 12px; }
+    .demo-label, .demo-banner > a, .section-kicker { font-size: 10px; }
+    .stat-top, .stat-grid.three .stat-top, .vehicle-card-stats > div > span { font-size: 11px; }
+    .stat-foot, .stat-grid.three .stat-foot, .expense-name small, .table-footer, .app-footer { font-size: 10px; }
+    .expense-name strong, .expense-table .amount-cell strong { font-size: 11px; }
+    .settings-heading p, .setting-row p, .profile-form-footer > span, .security-panel p { font-size: 11px; }
+    .auth-form .field input { min-height: 48px; }
+    .button { min-height: 44px; font-size: 12px; }
+    .modal-backdrop { padding-bottom: max(10px, env(safe-area-inset-bottom)); }
+    .modal-footer .button { min-height: 44px; }
+    .toast-stack { bottom: calc(145px + env(safe-area-inset-bottom)); }
+  }
+
 }
