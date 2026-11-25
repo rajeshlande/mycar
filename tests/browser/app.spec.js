@@ -230,14 +230,14 @@ test('payment method can be saved, edited and exported for an expense', async ({
   await page.getByRole('button', { name: 'Edit Payment mode test' }).click();
   dialog = page.getByRole('dialog');
   await expect(dialog.getByLabel('Payment method')).toHaveValue('upi');
-  await dialog.getByLabel('Payment method').selectOption('credit_card');
+  await dialog.getByLabel('Payment method').selectOption('rupay_credit_upi');
   await dialog.getByRole('button', { name: 'Save changes', exact: true }).click();
   await expect(dialog).toHaveCount(0);
-  await expect(page.locator('.expense-table')).toContainText('Credit card');
+  await expect(page.locator('.expense-table')).toContainText('RuPay credit card via UPI');
   const downloadPromise = page.waitForEvent('download');
   await page.getByRole('button', { name: 'Export CSV' }).click();
   const download = await downloadPromise;
   const stream = await download.createReadStream();
   let csv = ''; for await (const chunk of stream) csv += chunk.toString();
-  expect(csv).toContain('Payment method'); expect(csv).toContain('Credit card');
+  expect(csv).toContain('Payment method'); expect(csv).toContain('RuPay credit card via UPI');
 });

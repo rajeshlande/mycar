@@ -63,6 +63,7 @@ test('CSV quotes fields and neutralizes spreadsheet formulas', () => {
   assert.ok(csv.includes('Payment method'));
   assert.ok(csv.includes('Not specified'));
   assert.ok(expensesCSV([{ ...data.expenses[0], payment_method: 'upi' }], data.vehicles).includes('UPI'));
+  assert.ok(expensesCSV([{ ...data.expenses[0], payment_method: 'rupay_credit_upi' }], data.vehicles).includes('RuPay credit card via UPI'));
   assert.equal(csv.split('\r\n').length, data.expenses.length + 1);
 });
 test('distance conversion is canonical kilometres', () => {

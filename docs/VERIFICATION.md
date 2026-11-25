@@ -167,3 +167,7 @@ Existing Supabase installations need the updated `supabase/schema.sql` applied b
 ## Expense payment methods — v1.3.0
 
 Local verification: 17/17 logic and PGlite database tests passed, including a simulated upgrade of an existing expense with no assigned payment method, repeated schema application, all supported methods, invalid values and cross-user update isolation. At v1.3.0, the full Chromium browser suite passed 14/14 with retries disabled for both a simulated configured build and an unconfigured build; the new test adds, edits, displays and exports a payment method. Pages, security, version and agent checks passed. The sample workspace is memory-only; hosted Supabase writes and live migration have not been tested or performed. This is not payment processing and no card or UPI credentials are stored.
+
+## RuPay credit card via UPI — v1.3.1
+
+Local verification: 18/18 logic and PGlite tests passed, including an upgrade from the v1.3 payment constraint, preservation of existing UPI entries, repeat application and cross-user isolation. Production Pages build and check passed; 14/14 Chromium browser tests passed with retries disabled, including saving, editing, displaying and CSV-exporting the new payment label. Security and agent checks passed. Update the canonical `supabase/schema.sql` before deploying; no live migration was performed.

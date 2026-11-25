@@ -79,7 +79,7 @@ create table if not exists public.expenses (
 alter table public.expenses add column if not exists payment_method text;
 alter table public.expenses drop constraint if exists expenses_payment_method_check;
 alter table public.expenses add constraint expenses_payment_method_check
-  check (payment_method is null or payment_method in ('upi','credit_card','debit_card','cash','net_banking','bank_transfer','wallet','cheque','other'));
+  check (payment_method is null or payment_method in ('upi','rupay_credit_upi','credit_card','debit_card','cash','net_banking','bank_transfer','wallet','cheque','other'));
 
 create index if not exists expenses_user_date_idx on public.expenses(user_id, spent_on desc);
 create index if not exists expenses_vehicle_date_idx on public.expenses(vehicle_id, spent_on desc);

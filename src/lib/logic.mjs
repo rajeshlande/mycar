@@ -10,6 +10,7 @@ export const categoryFor = id => CATEGORIES.find(c => c.id === id) || CATEGORIES
 export const FUEL_TYPES = ['Petrol', 'Diesel', 'CNG', 'LPG', 'Electric', 'Hybrid', 'Petrol + CNG', 'Petrol + LPG', 'Petrol hybrid', 'Diesel hybrid', 'Plug-in hybrid', 'Hydrogen', 'Ethanol / flex fuel', 'Other'];
 export const PAYMENT_METHODS = [
   { value: 'upi', label: 'UPI' },
+  { value: 'rupay_credit_upi', label: 'RuPay credit card via UPI' },
   { value: 'credit_card', label: 'Credit card' },
   { value: 'debit_card', label: 'Debit card' },
   { value: 'cash', label: 'Cash' },

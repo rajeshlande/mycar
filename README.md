@@ -291,6 +291,6 @@ myCar supports car body styles, motorcycles, scooters and mopeds. Make and model
 
 ### Expense payment method
 
-Record an optional payment method (UPI, credit/debit card, cash, net banking, bank transfer, mobile wallet, cheque or other) when adding or editing an expense. It is a label only: myCar does not process payments or collect card details. Existing expenses remain “Not specified”. CSV exports include the method.
+Record an optional payment method (UPI, RuPay credit card via UPI, credit/debit card, cash, net banking, bank transfer, mobile wallet, cheque or other) when adding or editing an expense. It is a label only: myCar does not process payments or collect card details. Existing expenses remain “Not specified”. CSV exports include the method.
 
 **Before deploying this version:** Back up your Supabase project, then run the updated `supabase/schema.sql` in SQL Editor. The upgrade adds a nullable payment method to existing expenses without assigning a method to old records. The SQL also includes the earlier vehicle-type upgrade. Test on a staging project first, especially if you have customized your schema. No live database migration is performed by the deployment workflow.

@@ -4,6 +4,12 @@ All notable changes to myCar are documented here. The format follows Keep a Chan
 
 ## [Unreleased]
 
+## [1.3.1] - 2026-11-25
+
+### Added
+
+- RuPay credit card via UPI as a distinct expense payment method. Update the Supabase schema before deployment.
+
 ## [1.3.0] - 2026-11-25
 
 ### Added
