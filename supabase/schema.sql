@@ -75,6 +75,12 @@ create table if not exists public.expenses (
   -- including during an update. RLS alone does not validate foreign-key targets.
   foreign key (vehicle_id, user_id) references public.vehicles(id, user_id) on delete cascade
 );
+-- Optional for existing and new expenses; existing records are not relabelled.
+alter table public.expenses add column if not exists payment_method text;
+alter table public.expenses drop constraint if exists expenses_payment_method_check;
+alter table public.expenses add constraint expenses_payment_method_check
+  check (payment_method is null or payment_method in ('upi','credit_card','debit_card','cash','net_banking','bank_transfer','wallet','cheque','other'));
+
 create index if not exists expenses_user_date_idx on public.expenses(user_id, spent_on desc);
 create index if not exists expenses_vehicle_date_idx on public.expenses(vehicle_id, spent_on desc);
 create index if not exists expenses_user_category_idx on public.expenses(user_id, category);

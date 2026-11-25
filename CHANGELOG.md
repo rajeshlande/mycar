@@ -4,6 +4,16 @@ All notable changes to myCar are documented here. The format follows Keep a Chan
 
 ## [Unreleased]
 
+## [1.3.0] - 2026-11-25
+
+### Added
+
+- Optional expense payment method: UPI, credit card, debit card, cash, net banking, bank transfer, mobile wallet, cheque and other. Payment methods appear in the expense log and CSV export. Existing expenses remain unspecified.
+
+### Deployment
+
+- Run the updated Supabase schema before deploying; no payment processing or financial credentials are involved.
+
 ## [1.2.0] - 2026-11-02
 
 ### Added

@@ -134,3 +134,25 @@ test('existing v1 vehicles survive the vehicle type upgrade', async () => {
     await asUser(db, USER1, tx => tx.query("update vehicles set body_type='Scooter', fuel_type='LPG' where id=$1", [saved.rows[0].id]));
   } finally { await db.close(); }
 });
+
+test('payment methods upgrade preserves old expenses and remains owner-scoped', async () => {
+  const db = new PGlite();
+  try {
+    await db.exec(`create schema auth; create table auth.users(id uuid primary key, raw_user_meta_data jsonb default '{}'); create role anon nologin; create role authenticated nologin; create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;`);
+    const oldSql = sql.replace(/-- Optional for existing and new expenses;[\s\S]*?(?=create index if not exists expenses_user_date_idx)/, '');
+    assert.notEqual(oldSql, sql);
+    await db.exec(oldSql);
+    await db.query('insert into auth.users(id) values ($1), ($2)', [USER1, USER2]);
+    const vehicle = (await asUser(db, USER1, tx => insertVehicle(tx, 'Existing car'))).rows[0].id;
+    const expense = (await asUser(db, USER1, tx => insertExpense(tx, vehicle))).rows[0].id;
+    await db.exec(sql); await db.exec(sql);
+    const existing = (await asUser(db, USER1, tx => tx.query('select title,payment_method from expenses where id=$1', [expense]))).rows[0];
+    assert.equal(existing.title, 'Test expense'); assert.equal(existing.payment_method, null);
+    for (const method of ['upi','credit_card','debit_card','cash','net_banking','bank_transfer','wallet','cheque','other']) {
+      const result = await asUser(db, USER1, tx => tx.query('update expenses set payment_method=$1 where id=$2 returning payment_method', [method, expense]));
+      assert.equal(result.rows[0].payment_method, method);
+    }
+    await assert.rejects(() => asUser(db, USER1, tx => tx.query("update expenses set payment_method='invalid' where id=$1", [expense])), e => e.code === '23514');
+    assert.equal((await asUser(db, USER2, tx => tx.query("update expenses set payment_method='cash' where id=$1 returning id", [expense]))).rows.length, 0);
+  } finally { await db.close(); }
+});

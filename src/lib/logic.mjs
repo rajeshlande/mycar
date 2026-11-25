@@ -8,6 +8,18 @@ export const CATEGORIES = [
 ];
 export const categoryFor = id => CATEGORIES.find(c => c.id === id) || CATEGORIES.at(-1);
 export const FUEL_TYPES = ['Petrol', 'Diesel', 'CNG', 'LPG', 'Electric', 'Hybrid', 'Petrol + CNG', 'Petrol + LPG', 'Petrol hybrid', 'Diesel hybrid', 'Plug-in hybrid', 'Hydrogen', 'Ethanol / flex fuel', 'Other'];
+export const PAYMENT_METHODS = [
+  { value: 'upi', label: 'UPI' },
+  { value: 'credit_card', label: 'Credit card' },
+  { value: 'debit_card', label: 'Debit card' },
+  { value: 'cash', label: 'Cash' },
+  { value: 'net_banking', label: 'Net banking' },
+  { value: 'bank_transfer', label: 'Bank transfer' },
+  { value: 'wallet', label: 'Mobile wallet' },
+  { value: 'cheque', label: 'Cheque' },
+  { value: 'other', label: 'Other' },
+];
+export const paymentMethodLabel = value => PAYMENT_METHODS.find(method => method.value === value)?.label || 'Not specified';
 export const BODY_TYPES = ['SUV', 'Hatchback', 'Sedan', 'MPV', 'MUV', 'Crossover', 'Coupe', 'Convertible', 'Wagon', 'Pickup', 'Van', 'Motorcycle', 'Scooter', 'Moped', 'Other'];
 export const VEHICLE_COLORS = [
   { id: 'silver', label: 'Silver', hex: '#b8c2c0' },
@@ -106,8 +118,8 @@ export function csvCell(value) {
   return `"${text.replaceAll('"', '""')}"`;
 }
 export function expensesCSV(expenses, vehicles) {
-  const rows = [['Date', 'Vehicle', 'Category', 'Description', 'Amount (INR)', 'Vendor', 'Odometer (km)', 'Fuel (litres)', 'Notes'],
-    ...expenses.map(e => [e.spent_on, vehicles.find(v => v.id === e.vehicle_id)?.name || '', categoryFor(e.category).label, e.title, (e.amount_paise / 100).toFixed(2), e.vendor, e.odometer_km ?? '', e.fuel_litres ?? '', e.notes])];
+  const rows = [['Date', 'Vehicle', 'Category', 'Description', 'Amount (INR)', 'Vendor', 'Odometer (km)', 'Fuel (litres)', 'Notes', 'Payment method'],
+    ...expenses.map(e => [e.spent_on, vehicles.find(v => v.id === e.vehicle_id)?.name || '', categoryFor(e.category).label, e.title, (e.amount_paise / 100).toFixed(2), e.vendor, e.odometer_km ?? '', e.fuel_litres ?? '', e.notes, paymentMethodLabel(e.payment_method)])];
   return '\uFEFF' + rows.map(row => row.map(csvCell).join(',')).join('\r\n');
 }
 export function initials(name = '') { return name.trim().split(/\s+/).slice(0, 2).map(s => s[0]).join('').toUpperCase() || 'ME'; }

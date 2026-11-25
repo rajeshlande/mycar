@@ -5,7 +5,7 @@ import { makeSampleData } from './sample';
 
 const DataContext = createContext(null);
 const vehicleFields = ['name','make','model','year','registration','fuel_type','transmission','body_type','color','odometer_km','purchase_date','insurance_expiry','service_due_date','service_due_km','notes'];
-const expenseFields = ['vehicle_id','title','category','amount_paise','spent_on','odometer_km','fuel_litres','vendor','notes'];
+const expenseFields = ['vehicle_id','title','category','amount_paise','spent_on','odometer_km','fuel_litres','vendor','notes','payment_method'];
 const profileFields = ['full_name','phone','city','bio','distance_unit','monthly_budget_paise','reminders_enabled','reminder_days','theme'];
 const pick = (object, fields) => Object.fromEntries(fields.filter(key => object[key] !== undefined).map(key => [key, object[key]]));
 
