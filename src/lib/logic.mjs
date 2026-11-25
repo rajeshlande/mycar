@@ -32,7 +32,7 @@ export const VEHICLE_COLORS = [
 ];
 export const DEFAULT_PROFILE = {
   full_name: '', phone: '', city: '', bio: '', currency: 'INR', distance_unit: 'km',
-  monthly_budget_paise: 0, reminders_enabled: true, reminder_days: 30, theme: 'system',
+  monthly_budget_paise: 0, reminders_enabled: true, reminder_days: 30, theme: 'system', dashboard_tiles: {},
 };
 export function localISO(date = new Date()) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;

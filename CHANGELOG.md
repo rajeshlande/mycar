@@ -4,6 +4,16 @@ All notable changes to myCar are documented here. The format follows Keep a Chan
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-11-25
+
+### Added
+
+- Customize the dashboard by showing or hiding individual summary cards, vehicle spotlight, budget, reminders, charts and recent expenses. Signed-in preferences are saved to the account; sample choices stay in memory.
+
+### Deployment
+
+- Run the updated canonical `supabase/schema.sql` before deploying to add the dashboard preference column to profiles.
+
 ## [1.4.0] - 2026-11-25
 
 ### Changed

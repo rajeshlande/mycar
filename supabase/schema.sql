@@ -21,6 +21,13 @@ create table if not exists public.profiles (
   updated_at timestamptz not null default now()
 );
 
+-- Per-account tile choices: missing keys default to visible in the app.
+-- Existing profiles retain their current data and get an empty preferences object.
+alter table public.profiles add column if not exists dashboard_tiles jsonb not null default '{}'::jsonb;
+alter table public.profiles drop constraint if exists profiles_dashboard_tiles_check;
+alter table public.profiles add constraint profiles_dashboard_tiles_check
+  check (jsonb_typeof(dashboard_tiles) = 'object' and length(dashboard_tiles::text) <= 2048);
+
 create table if not exists public.vehicles (
   id uuid primary key default gen_random_uuid(),
   user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,

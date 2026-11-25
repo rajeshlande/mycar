@@ -83,4 +83,12 @@
     .toast-stack { bottom: calc(145px + env(safe-area-inset-bottom)); }
   }
 
+  .garage-overview.single-tile, .charts-grid.single-tile { grid-template-columns: minmax(0, 1fr); }
+  .dashboard-customize-intro { color: var(--muted-strong); font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
+  .dashboard-tile-list { display: grid; gap: 2px; }
+  .dashboard-tile-choice { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--line); font-size: 13px; cursor: pointer; }
+  .dashboard-tile-choice input { width: 20px; height: 20px; flex-shrink: 0; }
+  .dashboard-reset { margin-top: 18px; min-height: 44px; font-size: 12px; }
+  @media (max-width: 480px) { .dashboard-page .page-actions .button { min-height: 44px; } }
+
 }

@@ -10,13 +10,13 @@ const user = { id: USER_ID, aud: 'authenticated', role: 'authenticated', email: 
 const session = () => ({ access_token: token('authenticated'), refresh_token: 'fictional-refresh-token', token_type: 'bearer', expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, user });
 const profile = { id: USER_ID, full_name: 'Test Driver', phone: '', city: '', bio: '', currency: 'INR', distance_unit: 'km', monthly_budget_paise: 0, reminders_enabled: true, reminder_days: 30, theme: 'light' };
 
-async function mockBackend(page, captured) {
+async function mockBackend(page, captured, profileState = { ...profile }, failProfileSave = false) {
   await page.route(`${API}/**`, async route => {
     const request = route.request(); const url = new URL(request.url());
     const body = request.postDataJSON() || {};
     captured.push({ path: url.pathname, query: url.searchParams.toString(), method: request.method(), body, redirect: url.searchParams.get('redirect_to') });
     const json = data => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(data) });
-    if (url.pathname.startsWith('/rest/v1/profiles')) return json(profile);
+    if (url.pathname.startsWith('/rest/v1/profiles')) { if (request.method() === 'PATCH' && failProfileSave) return route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ message: 'Temporary test error' }) }); if (request.method() === 'PATCH') Object.assign(profileState, body); return json(profileState); }
     if (url.pathname.startsWith('/rest/v1/')) return json([]);
     if (url.pathname === '/auth/v1/token') return json(session());
     if (url.pathname === '/auth/v1/signup') return json({ ...user, identities: [] });
@@ -81,4 +81,47 @@ test('reset page does not allow a password change without a session', async ({ p
   await page.goto(`${AUTH_APP}/#/reset-password`);
   await expect(page.getByText('Your reset link is missing, expired, or already used.')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Request a new link' })).toBeVisible();
+});
+
+
+test('dashboard choices are saved to the account and restored on reload', async ({ page }) => {
+  const captured = []; const account = { ...profile, dashboard_tiles: {} };
+  await mockBackend(page, captured, account);
+  await page.goto(`${AUTH_APP}/#/login`);
+  await page.getByLabel('Email address').fill('driver@example.com');
+  await page.getByLabel('Password', { exact: false }).first().fill('a-test-password');
+  await page.getByRole('button', { name: 'Sign in to myCar' }).click();
+  await expect(page.getByRole('heading', { name: 'Your garage, at a glance.' })).toBeVisible();
+  await page.getByRole('button', { name: 'Customize', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Customize dashboard' });
+  await dialog.getByLabel('Fuel expenses').uncheck();
+  await dialog.getByLabel('Monthly budget').uncheck();
+  await dialog.getByRole('button', { name: 'Save dashboard' }).click();
+  await expect(dialog).toHaveCount(0);
+  const update = captured.find(r => r.path.endsWith('/profiles') && r.method === 'PATCH');
+  expect(update.body.dashboard_tiles).toMatchObject({ fuel: false, budget: false, total: true });
+  expect(update.query).toContain(`id=eq.${USER_ID}`);
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Your garage, at a glance.' })).toBeVisible();
+  await expect(page.locator('.budget-panel')).toHaveCount(0);
+  await expect(page.locator('.stat-card').filter({ hasText: 'Fuel expenses' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Customize', exact: true }).click();
+  await expect(page.getByRole('dialog').getByLabel('Fuel expenses')).not.toBeChecked();
+});
+
+
+test('dashboard preference save failure keeps the previous layout', async ({ page }) => {
+  const captured = []; await mockBackend(page, captured, { ...profile, dashboard_tiles: {} }, true);
+  await page.goto(`${AUTH_APP}/#/login`);
+  await page.getByLabel('Email address').fill('driver@example.com');
+  await page.getByLabel('Password', { exact: false }).first().fill('a-test-password');
+  await page.getByRole('button', { name: 'Sign in to myCar' }).click();
+  await expect(page.getByRole('heading', { name: 'Your garage, at a glance.' })).toBeVisible();
+  await page.getByRole('button', { name: 'Customize', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Customize dashboard' });
+  await dialog.getByLabel('Fuel expenses').uncheck();
+  await dialog.getByRole('button', { name: 'Save dashboard' }).click();
+  await expect(dialog.getByRole('alert')).toBeVisible();
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+  await expect(page.locator('.stat-card').filter({ hasText: 'Fuel expenses' })).toBeVisible();
 });

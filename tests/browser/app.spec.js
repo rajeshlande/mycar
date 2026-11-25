@@ -268,3 +268,26 @@ test('narrow mobile quick navigation stays within viewport', async ({ page }) =>
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(nav).toBeHidden();
 });
+
+test('dashboard tiles can be hidden, restored and cancelled in sample mode', async ({ page }) => {
+  await enterSample(page);
+  const open = () => page.getByRole('button', { name: 'Customize', exact: true }).click();
+  await open(); let dialog = page.getByRole('dialog', { name: 'Customize dashboard' });
+  await dialog.getByLabel('Fuel expenses').uncheck();
+  await dialog.getByLabel('Monthly budget').uncheck();
+  await dialog.getByRole('button', { name: 'Save dashboard' }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.locator('.stat-card').filter({ hasText: 'Fuel expenses' })).toHaveCount(0);
+  await expect(page.locator('.budget-panel')).toHaveCount(0);
+  await expect(page.locator('.vehicle-spotlight')).toBeVisible();
+  await open(); dialog = page.getByRole('dialog', { name: 'Customize dashboard' });
+  await expect(dialog.getByLabel('Fuel expenses')).not.toBeChecked();
+  await dialog.getByRole('button', { name: 'Show all tiles' }).click();
+  await dialog.getByRole('button', { name: 'Cancel' }).click();
+  await expect(page.locator('.budget-panel')).toHaveCount(0);
+  await open(); dialog = page.getByRole('dialog', { name: 'Customize dashboard' });
+  await dialog.getByRole('button', { name: 'Show all tiles' }).click();
+  await dialog.getByRole('button', { name: 'Save dashboard' }).click();
+  await expect(page.locator('.budget-panel')).toBeVisible();
+  await expect(page.locator('.stat-card').filter({ hasText: 'Fuel expenses' })).toBeVisible();
+});

@@ -78,3 +78,11 @@ test('sample data is internally consistent and never has future expense dates', 
   assert.ok(expenses.every(e => e.spent_on <= localISO()));
   assert.ok(expenses.every(e => Number.isInteger(e.amount_paise) && e.amount_paise > 0));
 });
+
+test('dashboard tile preferences default safely and retain explicit hidden tiles', async () => {
+  const { dashboardTileVisibility, DASHBOARD_TILES } = await import('../src/lib/dashboard-tiles.mjs');
+  assert.equal(Object.keys(dashboardTileVisibility({})).length, DASHBOARD_TILES.length);
+  assert.equal(dashboardTileVisibility(null).fuel, true);
+  assert.equal(dashboardTileVisibility({ fuel: false, total: true, budget: 'false' }).fuel, false);
+  assert.equal(dashboardTileVisibility({ budget: 'false' }).budget, true);
+});

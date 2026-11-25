@@ -175,3 +175,21 @@ test('RuPay UPI upgrade preserves existing v1.3 payment methods', async () => {
     assert.equal((await asUser(db, USER2, tx => tx.query("update expenses set payment_method='rupay_credit_upi' where id=$1 returning id", [e]))).rows.length, 0);
   } finally { await db.close(); }
 });
+
+test('dashboard preferences migrate existing profiles and remain account-isolated', async () => {
+  const db = new PGlite();
+  try {
+    await db.exec(`create schema auth; create table auth.users(id uuid primary key, raw_user_meta_data jsonb default '{}'); create role anon nologin; create role authenticated nologin; create function auth.uid() returns uuid language sql stable as $$ select nullif(current_setting('request.jwt.claim.sub', true), '')::uuid $$;`);
+    const before = sql.replace(/-- Per-account tile choices:[\s\S]*?(?=create table if not exists public.vehicles)/, '');
+    assert.notEqual(before, sql);
+    await db.exec(before);
+    await db.query('insert into auth.users(id) values ($1),($2)', [USER1, USER2]);
+    await db.exec(sql); await db.exec(sql);
+    assert.deepEqual((await asUser(db, USER1, tx => tx.query('select dashboard_tiles from profiles where id=$1', [USER1]))).rows[0].dashboard_tiles, {});
+    await asUser(db, USER1, tx => tx.query('update profiles set dashboard_tiles=$1 where id=$2', [JSON.stringify({ fuel: false, budget: true }), USER1]));
+    assert.deepEqual((await asUser(db, USER1, tx => tx.query('select dashboard_tiles from profiles where id=$1', [USER1]))).rows[0].dashboard_tiles, { fuel: false, budget: true });
+    assert.equal((await asUser(db, USER2, tx => tx.query("update profiles set dashboard_tiles='{}' where id=$1 returning id", [USER1]))).rows.length, 0);
+    await assert.rejects(() => asUser(db, USER1, tx => tx.query("update profiles set dashboard_tiles='[]' where id=$1", [USER1])), e => e.code === '23514');
+    await assert.rejects(() => asUser(db, USER1, tx => tx.query('update profiles set dashboard_tiles=$1 where id=$2', [JSON.stringify({ huge: 'x'.repeat(3000) }), USER1])), e => e.code === '23514');
+  } finally { await db.close(); }
+});

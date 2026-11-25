@@ -294,3 +294,9 @@ myCar supports car body styles, motorcycles, scooters and mopeds. Make and model
 Record an optional payment method (UPI, RuPay credit card via UPI, credit/debit card, cash, net banking, bank transfer, mobile wallet, cheque or other) when adding or editing an expense. It is a label only: myCar does not process payments or collect card details. Existing expenses remain “Not specified”. CSV exports include the method.
 
 **Before deploying this version:** Back up your Supabase project, then run the updated `supabase/schema.sql` in SQL Editor. The upgrade adds a nullable payment method to existing expenses without assigning a method to old records. The SQL also includes the earlier vehicle-type upgrade. Test on a staging project first, especially if you have customized your schema. No live database migration is performed by the deployment workflow.
+
+### Customize dashboard tiles
+
+Select **Customize** on the Dashboard to show or hide summary cards, the vehicle spotlight, budget, reminders, charts and recent expenses. Select **Show all tiles** to reset the choices. Signed-in choices are stored in your Supabase profile and follow your account across devices. Sample workspace changes are temporary and reset when you refresh.
+
+Before deploying this feature, back up your Supabase project and run the updated canonical `supabase/schema.sql` in SQL Editor (test on staging first if your schema is customized). It adds an account-owned `dashboard_tiles` preference with defaults that keep existing tiles visible. No live migration is run automatically.
