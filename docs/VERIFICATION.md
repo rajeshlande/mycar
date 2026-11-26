@@ -1,3 +1,13 @@
+# Verification update: v1.5.2
+
+- Logic and PGlite database suite: 20 passed.
+- Playwright: 21 passed on both unconfigured and simulated-configured Pages builds, including mobile 320px expense rows, native category arrow-key selection, optional detail visibility and payment-method preservation/export. Automated axe checks run for main screens and dialogs in both themes.
+- `build:pages`, `check:pages`, `check:agents`, `security:check` and `version:check` passed.
+- Inspected emulated 390px expense form and list. Physical-device, screen-reader, live Supabase and live email tests remain outstanding.
+- No schema changes or hosted data changes in this release.
+
+---
+
 # myCar verification record
 
 Latest local verification: 2026-11-02

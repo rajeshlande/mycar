@@ -4,6 +4,14 @@ All notable changes to myCar are documented here. The format follows Keep a Chan
 
 ## [Unreleased]
 
+## [1.5.2] - 2026-11-01
+
+### Changed
+
+- Improved mobile expense rows with visible vehicle names, readable dates and larger row and pagination actions.
+- Made expense categories native keyboard-accessible radio inputs and grouped optional expense details in an expandable section.
+- Improved connection-note readability and shortened supporting copy based on an Impeccable-inspired UI review.
+
 ## [1.5.1] - 2026-11-26
 
 ### Changed

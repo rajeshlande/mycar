@@ -53,7 +53,7 @@ test('sample dashboard, filters, expense create/edit/delete and CSV export', asy
   await dialog.getByRole('radio', { name: 'Tolls & FASTag' }).click();
   await expect(dialog.getByLabel('Amount in rupees')).toHaveValue('123.45');
   await expect(dialog.getByLabel('Description')).toHaveValue('Test bridge toll');
-  await expect(dialog.getByRole('radio', { name: 'Tolls & FASTag' })).toHaveAttribute('aria-checked', 'true');
+  await expect(dialog.getByRole('radio', { name: 'Tolls & FASTag' })).toBeChecked();
   await dialog.getByRole('button', { name: 'Save expense', exact: true }).click();
   await expect(dialog).toHaveCount(0);
   await expect(addExpense).toBeFocused();
@@ -221,6 +221,7 @@ test('payment method can be saved, edited and exported for an expense', async ({
   let dialog = page.getByRole('dialog');
   await dialog.getByLabel('Amount in rupees').fill('120');
   await dialog.getByLabel('Description').fill('Payment mode test');
+  await dialog.getByText('More details', { exact: false }).click();
   await dialog.getByLabel('Payment method').selectOption('upi');
   await dialog.getByRole('button', { name: 'Save expense', exact: true }).click();
   await expect(dialog).toHaveCount(0);
@@ -253,6 +254,7 @@ test('mobile quick navigation works without covering content', async ({ page }) 
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
   }
   await page.getByRole('button', { name: 'Add expense', exact: true }).last().click();
+  await page.getByRole('dialog').getByText('More details', { exact: false }).click();
   await expect(page.getByRole('dialog').getByLabel('Payment method')).toBeVisible();
   await page.getByRole('button', { name: 'Close dialog' }).click();
 });
@@ -310,4 +312,30 @@ test('readability and date controls retain usable sizes on mobile and desktop', 
   expect(await table.evaluate(el => el.scrollWidth > el.clientWidth)).toBeTruthy();
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(page.locator('.expense-table th').first()).toHaveCSS('font-size', '12px');
+});
+
+
+test('mobile expense rows and native category keyboard interaction', async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await enterSample(page);
+  await page.getByRole('navigation', { name: 'Quick navigation' }).getByRole('link', { name: 'Spending' }).click();
+  const row = page.locator('.full-expense-table tbody tr').first();
+  await expect(row.locator('.mobile-expense-vehicle')).toBeVisible();
+  await expect(row.locator('.mobile-expense-vehicle')).toContainText('My Creta');
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  const scroll = await page.locator('.table-scroll').evaluate(el => ({ width: el.clientWidth, content: el.scrollWidth }));
+  expect(scroll.content).toBeLessThanOrEqual(scroll.width);
+  for (const button of await row.locator('.table-actions button').all()) { const box = await button.boundingBox(); expect(box.width).toBeGreaterThanOrEqual(44); expect(box.height).toBeGreaterThanOrEqual(44); }
+  await page.getByRole('button', { name: 'Add expense', exact: true }).first().click();
+  const dialog = page.getByRole('dialog');
+  const fuel = dialog.getByRole('radio', { name: 'Fuel', exact: true });
+  const service = dialog.getByRole('radio', { name: 'Service & repairs', exact: true });
+  await fuel.focus(); await page.keyboard.press('ArrowRight');
+  await expect(service).toBeChecked();
+  await expect(dialog.getByLabel('Payment method')).not.toBeVisible();
+  await dialog.getByText('More details', { exact: false }).click();
+  await dialog.getByLabel('Payment method').selectOption('upi');
+  await dialog.getByText('More details', { exact: false }).click();
+  await dialog.getByText('More details', { exact: false }).click();
+  await expect(dialog.getByLabel('Payment method')).toHaveValue('upi');
 });
