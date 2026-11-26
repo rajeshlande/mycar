@@ -291,3 +291,23 @@ test('dashboard tiles can be hidden, restored and cancelled in sample mode', asy
   await expect(page.locator('.budget-panel')).toBeVisible();
   await expect(page.locator('.stat-card').filter({ hasText: 'Fuel expenses' })).toBeVisible();
 });
+
+test('readability and date controls retain usable sizes on mobile and desktop', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#/login');
+  await expect(page.getByLabel('Email address')).toHaveCSS('font-size', '16px');
+  await enterSample(page);
+  const arrow = page.locator('.dashboard-filters .month-picker .icon-button').first();
+  const size = await arrow.boundingBox();
+  expect(size.width).toBeGreaterThanOrEqual(40);
+  expect(size.height).toBeGreaterThanOrEqual(40);
+  await expect(page.locator('.stat-top').first()).toHaveCSS('font-size', '12px');
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto('/#/vehicles/sample-creta');
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+  const table = page.locator('.table-scroll');
+  expect(await table.evaluate(el => el.scrollWidth > el.clientWidth)).toBeTruthy();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(page.locator('.expense-table th').first()).toHaveCSS('font-size', '12px');
+});

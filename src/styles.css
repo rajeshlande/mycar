@@ -91,4 +91,46 @@
   .dashboard-reset { margin-top: 18px; min-height: 44px; font-size: 12px; }
   @media (max-width: 480px) { .dashboard-page .page-actions .button { min-height: 44px; } }
 
+
+  /* Readable, consistent interface sizing while retaining myCar's palette. */
+  .eyebrow, .section-kicker, .nav-group-label, .workspace-label, .story-eyebrow, .auth-topline, .spotlight-eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 0; text-transform: none;
+  }
+  .nav-group-label { margin-bottom: 8px; }
+  .nav-item { font-size: 14px; }
+  .breadcrumb, .connection-status, .topbar-profile { font-size: 12px; }
+  .page-heading p, .auth-form-heading p, .panel-heading p, .setting-row p, .settings-heading p,
+  .security-panel p, .profile-form-footer > span, .notice { font-size: 13px; line-height: 1.55; }
+  .field > label, .field > div > label, .auth-form .field > label { font-size: 13px; }
+  .field input:not([type=checkbox]), .field select, .field textarea, .auth-form .field input,
+  .setting-row select, .budget-setting-input input, .search-input input { font-size: 14px; min-height: 44px; }
+  .button { min-height: 44px; font-size: 13px; }
+  .stat-card { padding: 20px; }
+  .stat-top, .stat-grid.three .stat-top { font-size: 12px; }
+  .stat-foot, .stat-grid.three .stat-foot, .budget-month, .budget-meta, .budget-note,
+  .expense-name small, .table-footer, .app-footer, .auth-form-footer { font-size: 12px; }
+  .table-scroll { position: relative; }
+  .expense-table th { font-size: 12px; letter-spacing: 0; text-transform: none; }
+  .expense-name strong, .expense-table .amount-cell strong, .expense-table td { font-size: 13px; }
+  .chart-y-axis { width: 60px; font-size: 11px; }
+  .bar-label, .chart-key, .chart-legend > button { font-size: 11px; }
+  .stat-value, .amount-cell, .budget-amount, .budget-meta { font-variant-numeric: tabular-nums; }
+  .demo-banner, .demo-label { font-size: 11px; letter-spacing: 0; }
+  .spotlight-tag, .spotlight-link, .number-plate { font-size: 11px; letter-spacing: 0; }
+  .stat-icon { background: var(--soft); color: var(--muted-strong); }
+  @media (max-width: 700px) {
+    .field input:not([type=checkbox]), .field textarea, .auth-form .field input,
+    .search-input input, .vehicles-toolbar .search-input input, .budget-setting-input input { font-size: 16px; }
+    .mobile-primary-nav a { font-size: 11px; }
+    .dashboard-filters { flex-wrap: wrap; }
+    .month-picker { min-height: 44px; height: auto; }
+    .month-picker .icon-button { width: 40px; height: 40px; }
+    .month-picker select, .vehicle-filter select { font-size: 12px; }
+    .table-actions .icon-button, .full-expense-table .table-actions .icon-button,
+    .expense-table .row-action { width: 40px; height: 40px; }
+    .expense-table .table-actions { gap: 4px; }
+    .stat-card { padding: 16px; }
+    .app-footer { padding-bottom: 24px; }
+  }
+
 }

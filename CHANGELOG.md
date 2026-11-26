@@ -4,6 +4,13 @@ All notable changes to myCar are documented here. The format follows Keep a Chan
 
 ## [Unreleased]
 
+## [1.5.1] - 2026-11-26
+
+### Changed
+
+- Improved readability, mobile date and table-action touch targets, spacing and task-focused copy while retaining the myCar design and features. Based on the Unslop design audit by Damir Sokolovsky.
+- Fixed a narrow-screen vehicle-detail page overflow while keeping the expense table horizontally scrollable.
+
 ## [1.5.0] - 2026-11-25
 
 ### Added
