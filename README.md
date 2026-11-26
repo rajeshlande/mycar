@@ -1,302 +1,160 @@
 # myCar
 
-**Your personal garage.** A mobile-first, installable vehicle-expense tracker built with React, Vite, and Supabase.
+**Your personal garage, in your pocket.** Track vehicles and expenses, see where your money goes, and keep important care dates in view.
 
-myCar adapts the technical foundation of the supplied [yoga_studio reference](https://github.com/rajeshlande/yoga_studio): React + Vite, Supabase email authentication, exact INR accounting, and a PWA cache that contains public app files only. The interface, vehicle schema, and expense workflows are new. See [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+<p align="center">
+  <a href="https://github.com/rajeshlande/mycar/actions/workflows/pages.yml"><img src="https://shieldcn.dev/github/ci/rajeshlande/mycar.svg?workflow=pages.yml&amp;branch=main&amp;variant=secondary" alt="GitHub Pages workflow status" /></a>
+  <a href="https://github.com/rajeshlande/mycar/commits/main"><img src="https://shieldcn.dev/github/last-commit/rajeshlande/mycar.svg?variant=secondary" alt="Last commit" /></a>
+  <a href="https://github.com/rajeshlande/mycar/stargazers"><img src="https://shieldcn.dev/github/stars/rajeshlande/mycar.svg?variant=secondary" alt="GitHub stars" /></a>
+</p>
 
-## What is included
+<p align="center"><a href="https://rajeshlande.github.io/mycar/">Open myCar</a> · <a href="#getting-started">Get started</a> · <a href="#deployment">Deploy</a> · <a href="CHANGELOG.md">Changelog</a></p>
 
-- **Accounts:** sign up, email confirmation, sign in, forgot password, secure password reset, and sign out.
-- **Dashboard:** monthly totals, fuel and service costs, month-over-month comparison, a six-month chart, category breakdown, budget progress, and vehicle filtering.
-- **Expenses:** create, edit, delete, search, category/vehicle/month/date-range filters, sorting, pagination, and filtered CSV export.
-- **My vehicles:** multiple vehicles, default-vehicle selection, registration, make/model/year, fuel and transmission, colour, odometer, purchase date, care dates, notes, and individual expense history.
-- **Care reminders:** upcoming or overdue insurance and service reminders, based on saved dates and odometer readings. These are **in-app only**.
-- **Profile:** editable name, phone, city, and bio; account email and password-reset action.
-- **Settings:** light/dark/system appearance, kilometre/mile display, monthly garage budget, reminder preferences, CSV export, privacy note, and installation help.
-- **PWA:** web manifest, generated PNG/SVG icons, standalone display, install prompts where supported, and a versioned offline app shell.
-- **Sample workspace:** an explicit, fictional, memory-only preview available from the sign-in screen. It never creates an account, writes to Supabase, or survives a refresh.
+myCar is a mobile-first, installable web app built with React, Vite and Supabase. Explore the **sample workspace** without an account, or connect your own Supabase project to save your garage across devices.
 
-## Important: preview vs. connected accounts
+![myCar dashboard](docs/screenshots/dashboard-desktop.png)
 
-The delivered preview starts **without Supabase credentials**. You can explore all sample-workspace features immediately, but real sign-in/sign-up and cloud saving require your own project configuration. The app does not pretend that authentication succeeded when no backend is configured.
+## Features
 
-No real Supabase project or mailbox was available during the build. SDK contract tests use intercepted responses; they are not evidence of live email delivery or hosted-project acceptance. Complete the checklist below before launch.
+- **Your garage:** manage multiple cars, motorcycles, scooters and mopeds; set a default vehicle and view its expense history. Make and model suggestions support Indian vehicles, while custom entries cover anything not listed. Fuel choices include alternative, dual-fuel and custom values.
+- **Expense tracking:** add, edit and delete expenses; filter, search, sort and export results as CSV. Optional payment methods are labels only—myCar does not process payments or collect card details.
+- **Dashboard:** review monthly spending, fuel and service costs, trends, categories, budget progress and recent activity. Customize which sections are visible; signed-in preferences follow your account across devices.
+- **Care reminders:** see upcoming and overdue service and insurance dates in the app.
+- **Your account:** sign up, confirm your email, sign in, reset your password, and update your profile and preferences.
+- **Made for mobile:** light, dark and system themes, responsive layouts and a PWA install experience where supported.
 
-## Requirements
+> **Sample mode is temporary.** Its fictional data and dashboard preferences are kept in memory and reset on refresh. Real accounts and cloud storage require Supabase configuration.
 
-- Node.js **20.19+** (Node 22 recommended for deployment)
+## Getting started
+
+### Requirements
+
+- Node.js **20.19 or later** (Node 22 recommended)
 - npm
-- A Supabase project with Email authentication enabled
-- HTTPS for a deployed PWA; localhost is also a secure context for development
+- A Supabase project with email authentication enabled for real accounts
+- HTTPS for deployed PWA features; localhost works for development
 
-## 1. Install and run
+### 1. Install and start
+
+From the project directory in Git Bash (also works in macOS/Linux shells):
 
 ```bash
 npm ci
-
-# macOS / Linux
 cp .env.example .env.local
-
-# Windows PowerShell
-Copy-Item .env.example .env.local
-
-# Edit .env.local as described below, then:
 npm run dev
 ```
 
-The development server binds to `0.0.0.0` and prefers port `5173`. If that port is busy, Vite automatically tries the next free port; open the URL printed in the terminal. Without credentials, use **Explore a sample workspace**. The in-app **Setup guide** explains the same configuration steps.
+Open the URL printed in the terminal. The server prefers port `5173` and automatically chooses another if it is occupied. Without Supabase credentials, select **Explore a sample workspace**. To use real accounts, complete the next steps and restart the development server.
 
-## 2. Create the database
+### 2. Set up Supabase
 
-Open **Supabase → SQL Editor**, paste the entire contents of [`supabase/schema.sql`](supabase/schema.sql), and run it.
-
-The script creates:
-
-| Table | Purpose |
-|---|---|
-| `profiles` | One private profile/preferences row per authenticated user |
-| `vehicles` | Owner-scoped vehicle records |
-| `expenses` | Owner-scoped expenses linked to an owner-matching vehicle |
-
-It also creates the signup-profile trigger, update timestamps, indexes, constraints, owner-only RLS policies, least-privilege grants, and an atomic `set_primary_vehicle(uuid)` function.
-
-The file is safe to rerun for this v1 schema and does not delete business records. **Use a dedicated project.** If your project already has unrelated tables named `profiles`, `vehicles`, or `expenses`, review and resolve the collision before running it; `CREATE TABLE IF NOT EXISTS` is not a schema merger.
-
-### Data rules
-
-- Money is integer **paise**, never floating-point rupees. ₹1,234.50 is `123450`.
-- This release uses **INR only**. There is no currency relabeling or implicit exchange-rate conversion.
-- Odometers are stored in whole kilometres. Miles are converted for display/input.
-- A composite `(vehicle_id, user_id)` foreign key prevents cross-account vehicle references, including updates.
-- Deleting a vehicle cascades to its expenses. The UI requires explicit confirmation and states the number of affected expenses.
-- Registration uniqueness is per account, ignoring whitespace and case.
-- Profile identity fields and timestamps are not writable by browser clients.
-
-## 3. Add public Supabase configuration
-
-In **Project Settings → API**, copy the project URL and a **publishable** key (`sb_publishable_…`) or legacy **anon** JWT.
+1. Create or choose a dedicated Supabase project.
+2. In **SQL Editor**, run the entire canonical [`supabase/schema.sql`](supabase/schema.sql). It creates the profiles, vehicles and expenses tables, owner-scoped RLS policies, grants, constraints, triggers and helper function.
+3. In **Project Settings → API**, copy your project URL and publishable key or legacy anon key. Add them to `.env.local`:
 
 ```dotenv
-VITE_SUPABASE_URL=https://YOUR-PROJECT.supabase.co
-VITE_SUPABASE_ANON_KEY=YOUR-PUBLISHABLE-OR-ANON-KEY
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-publishable-or-anon-key
 ```
 
-Put these in `.env.local`, restart the dev server, and rebuild for deployment.
+These are browser-visible values. **Never use a service-role key, secret key, database password or SMTP credential in a `VITE_` variable.** Public keys depend on correctly configured RLS and grants.
 
-**Never put a service-role key, `sb_secret_…` key, database password, or SMTP credential in a `VITE_` variable.** Vite exposes these values to the browser. The build rejects privileged/malformed keys and non-HTTPS project URLs. Public keys are safe only when RLS and grants are configured correctly.
+**Existing projects:** Back up first and test the current schema on staging, especially if you have customized tables or constraints. The canonical script includes the upgrades for vehicle types and fuels, expense payment methods and account dashboard preferences. It is designed to be rerunnable for the standard schema, but `CREATE TABLE IF NOT EXISTS` does not merge arbitrary existing schemas. Deployment does not run SQL for you.
 
-## 4. Configure authentication emails
+### 3. Configure authentication redirects
 
-In **Authentication → URL Configuration**:
-
-1. Set **Site URL** to the full deployed app URL, including a repository path on GitHub Pages.
-2. Add the exact redirect URLs used by the app:
+In Supabase **Authentication → URL Configuration**, set the Site URL to your deployed app URL and allow the exact login and password-reset redirect URLs. For the myCar GitHub Pages site, add:
 
 ```text
+https://rajeshlande.github.io/mycar/#/login
+https://rajeshlande.github.io/mycar/#/reset-password
 http://localhost:5173/#/login
 http://localhost:5173/#/reset-password
-https://YOUR-APP.example/#/login
-https://YOUR-APP.example/#/reset-password
 ```
 
-For GitHub Pages, use `https://YOUR-USER.github.io/YOUR-REPO/` before each hash. If local development prints a fallback port such as `5174`, allow that exact localhost origin too. Add only the preview origins you actually use; avoid an unrestricted production redirect wildcard.
+If Vite uses another local port, allow the corresponding URLs as well. Keep email confirmation enabled. The client uses PKCE: use Supabase's default `{{ .ConfirmationURL }}` behavior or ensure custom templates honor the requested redirect, and open recovery links in the same browser that requested them. Configure custom SMTP and review authentication rate limits before public launch.
 
-Keep email confirmations enabled. The client explicitly uses the **PKCE** flow. Use Supabase’s default `{{ .ConfirmationURL }}` email-link behavior, or ensure customized templates honor the requested redirect. Open recovery links in the same browser that requested them.
+### 4. Verify your project
 
-The built-in Supabase email service is for testing and is rate-limited. Configure **custom SMTP** and review password/rate-limit settings before a public launch. The app uses neutral reset-success wording and maps common Auth errors without logging credentials.
+- [ ] Sign up, confirm the email, sign in and reset a password.
+- [ ] Add a vehicle and create, edit and delete an expense; export a CSV.
+- [ ] Save profile, settings and dashboard preferences; check them on another device.
+- [ ] Confirm a second account cannot access the first account's data.
+- [ ] Test sign-out, offline app-shell behavior and installation on real devices.
 
-## 5. First-drive checklist
-
-- [ ] Run the schema in the intended project.
-- [ ] Add public environment values and restart/rebuild.
-- [ ] Configure Site URL and both redirect URLs.
-- [ ] Create an account and confirm its email.
-- [ ] Sign in, add a vehicle, and add/edit/delete an expense.
-- [ ] Confirm a second account cannot see the first account’s records.
-- [ ] Save profile, budget, distance, theme, and reminder preferences.
-- [ ] Export a CSV and open it in a spreadsheet.
-- [ ] Request a reset email, open it in the same browser, and set a new password.
-- [ ] Sign out and confirm protected routes require sign-in.
-- [ ] Deploy over HTTPS, load once online, then test the offline shell.
-- [ ] Install from the browser on a real Android/iOS device.
-
-## Commands
-
-```bash
-npm run dev              # Development on 0.0.0.0; prefers 5173, falls back if busy
-npm run build            # Production build; relative base supports nested hosting
-npm run build:pages      # GitHub Pages build (same relative-base output)
-npm run preview          # Serve the production build on 0.0.0.0:4173
-npm test                 # Pure-logic tests + real SQL/RLS tests in PGlite
-npm run security:check   # Browser-source credential and worker-guard checks
-npm run check:agents     # Agent docs, skill frontmatter, links, and paths
-npm run check:pages      # Validate dist/ for GitHub Pages/PWA hosting
-npm run version:check    # Verify package/lockfile/changelog version alignment
-npm run version:patch    # Bump patch version and date changelog notes
-npm run version:minor    # Bump minor version and date changelog notes
-npm run version:major    # Bump major version and date changelog notes
-npm run test:browser     # Production UI tests + mocked Supabase contract tests
-```
-
-Browser tests require a production build first:
-
-```bash
-npm run build
-npx playwright install chromium
-# Linux/CI may need: npx playwright install --with-deps chromium
-npm run test:browser
-```
-
-The browser suite starts three servers: a production preview on port 4173, a fake-configured development server on port 5174 for intercepted Auth contract tests, and an always-unconfigured development server on port 5175 for setup-mode checks. All Supabase requests in authentication tests are intercepted, and the production-preview suite blocks non-local network access so it can never authenticate against a real project. No real credentials or mailbox are needed.
-
-The preview on 4173 is built with whatever `VITE_SUPABASE_*` values are present, so it may be configured or unconfigured. Setup-mode assertions use port 5175 instead, which keeps the suite green both before and after you add repository secrets. The Playwright server environment is configured in `playwright.config.js`, so the command works on Windows, macOS, and Linux.
-
-Executed checks and remaining live-project checks are recorded in [`docs/VERIFICATION.md`](docs/VERIFICATION.md).
-
-## Version management
-
-`package.json` is the version source of truth. Release notes live in [`CHANGELOG.md`](CHANGELOG.md). The bump scripts update the package, lockfile, and changelog; they do not commit, tag, or push.
-
-```bash
-npm run version:check
-npm run version:patch   # or version:minor / version:major
-```
-
-See [`docs/VERSIONING.md`](docs/VERSIONING.md) for the release checklist and [`docs/GITHUB_PUSH.md`](docs/GITHUB_PUSH.md) for exact GitHub push/tag commands.
-
-## Troubleshooting
-
-### `Port 5173 is already in use`
-
-The current config prefers `5173` but no longer hard-fails when it is busy. Use the URL Vite prints, or choose another port:
-
-```bash
-npm run dev -- --port 5174
-```
-
-If you want to stop the old process on Windows, first identify it:
-
-```powershell
-Get-NetTCPConnection -LocalPort 5173 -State Listen | Select-Object LocalAddress, LocalPort, OwningProcess
-Get-Process -Id <PID>
-```
-
-Only stop it if you recognize it as an old Node/Vite server:
-
-```powershell
-Stop-Process -Id <PID> -Force
-```
-
-Command Prompt equivalent:
-
-```bat
-netstat -ano | findstr :5173
-tasklist /FI "PID eq <PID>"
-taskkill /PID <PID> /F
-```
-
-Do not kill an unknown PID. Closing the old terminal that ran `npm run dev` is often enough.
+Live Supabase authentication, email delivery, physical-device behavior and screen-reader use must be verified in your own environment. See [`docs/VERIFICATION.md`](docs/VERIFICATION.md).
 
 ## Deployment
 
 ### GitHub Pages
 
-The project is configured for GitHub Pages project sites (`https://USER.github.io/REPO/`) and root/custom-domain sites. It uses a relative Vite base, hash routing, relative PWA paths, and `public/.nojekyll`.
+1. In the repository's **Settings → Pages**, set the source to **GitHub Actions**.
+2. Under **Settings → Secrets and variables → Actions**, add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as repository secrets, using only public configuration.
+3. Push to `main` or manually run **Deploy myCar to GitHub Pages** from Actions.
+4. Set the Supabase Site URL and redirects for the final Pages URL as described above.
 
-1. Push this project to a GitHub repository with the default branch `main`.
-2. In **Settings → Pages**, set **Source** to **GitHub Actions**.
-3. In **Settings → Secrets and variables → Actions**, add repository secrets:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY` (publishable or legacy anon key only)
-4. Push to `main`, or run **Deploy myCar to GitHub Pages** manually from the Actions tab.
-5. Open the deployed URL from the workflow’s `deploy` job.
-6. In Supabase **Authentication → URL Configuration**, set the Site URL and redirect URLs to the final Pages origin, including the repository path:
-   - `https://USER.github.io/REPO/#/login`
-   - `https://USER.github.io/REPO/#/reset-password`
-
-The workflow runs credential/agent checks, logic/database tests, browser tests, builds with `npm run build:pages`, validates the output with `npm run check:pages`, and deploys `dist`. If the Supabase secrets are missing, the site still deploys but opens in setup/sample mode and the workflow prints a warning.
-
-Local Pages verification:
+The workflow checks the project, builds and tests it, then deploys `dist`. Without the secrets it deploys in setup/sample mode. Relative assets and hash routing support repository paths. To check the Pages build locally:
 
 ```bash
 npm run build:pages
 npm run check:pages
-npm run preview -- --base=/YOUR-REPO/ --port 4175
+npm run preview -- --base=/mycar/ --port 4175
 ```
 
-Then open `http://localhost:4175/YOUR-REPO/`. Hash routing avoids server-side SPA rewrite requirements.
+Open `http://localhost:4175/mycar/`. Other static hosts can use `npm run build`, publish `dist`, supply the same public variables at build time and serve over HTTPS. Keep the service worker and precache manifest at the app root and do not CDN-cache Supabase API or Auth responses.
 
-### Vercel, Netlify, or static hosting
+## Development and testing
 
-- Framework/build command: `npm run build`
-- Output directory: `dist`
-- Set the two public environment variables before building.
-- Serve over HTTPS.
-- Keep `sw.js` and `precache.json` at the deployed app root and revalidate them on updates.
-- Do not cache Supabase API/Auth responses at the CDN.
+| Command | Purpose |
+| --- | --- |
+| `npm run dev` | Start the development server |
+| `npm run build` | Build for production |
+| `npm run build:pages` | Build for GitHub Pages |
+| `npm run preview` | Serve the production build |
+| `npm test` | Run logic and SQL/RLS tests using PGlite |
+| `npm run test:browser` | Run Playwright UI and mocked Supabase contract tests |
+| `npm run security:check` | Check browser-source credentials and worker guards |
+| `npm run check:agents` | Check agent instructions and local skills |
+| `npm run check:pages` | Validate built Pages/PWA output |
+| `npm run version:check` | Check version alignment |
 
-## Security and offline behavior
+For browser tests, build first and install Chromium:
 
-- Supabase manages passwords, sessions, email verification, and recovery. The app never stores a password itself.
-- Every exposed table has RLS and explicit authenticated-only grants; anonymous table access is revoked.
-- The service worker caches only the app shell, fonts, icons, manifest, and illustrative image. It excludes non-GET requests and cross-origin/API traffic.
-- Private records are held in memory while signed in. There is **no offline financial-data cache or write queue**. Reconnect to load/save account data.
-- The SDK’s session persistence is separate from the static cache. Theme is the only additional persistent app preference.
-- Sample data is fictional and memory-only. It is not an offline authentication bypass.
-- CSV export escapes quotes and neutralizes spreadsheet-formula prefixes in text cells.
-- Sign out clears the current local session; it does not intentionally revoke every other device.
+```bash
+npm run build
+npx playwright install chromium
+npm run test:browser
+```
 
-## Deliberate limits
+Linux/CI may require `npx playwright install --with-deps chromium`. The suite uses local servers and intercepted Supabase responses; it does not prove a hosted project or mailbox works. See [`docs/VERIFICATION.md`](docs/VERIFICATION.md) for test details and outstanding checks.
 
-- No push/email maintenance notifications; reminders appear only inside the app.
-- No receipt uploads, OCR, fuel-efficiency estimation, multi-currency conversion, account deletion, or in-app email-address change.
-- Vehicle images are generic illustrations, not exact photographs of each recorded model.
-- A service-role key is not needed by any implemented feature.
-- Publishing a production privacy policy, retention rules, support contact, and SMTP configuration remains the project owner’s responsibility.
+If port 5173 is occupied, use the fallback URL or choose a port with `npm run dev -- --port 5174`. Close an old development server only if you recognize it; do not terminate an unknown process.
 
-## Agent instructions and repo-local skills
+## Data, privacy and limitations
 
-- [`AGENTS.md`](AGENTS.md) is the canonical project rule set for coding agents.
-- [`CLAUDE.md`](CLAUDE.md) imports `AGENTS.md` and points Claude Code to the matching repo-local skills.
-- [`.claude/skills/`](.claude/README.md) contains five task-specific skills: `mycar-supabase`, `mycar-ui`, `mycar-pwa`, `mycar-verify`, and `mycar-release`.
+- Amounts are stored in integer **paise** and displayed in INR; there is no currency conversion. Odometers are stored in kilometres, with optional mile display/input.
+- Records are scoped to the authenticated user. Deleting a vehicle also deletes its expenses; the app asks for confirmation.
+- The service worker caches the static app shell, not Supabase API/Auth responses or private financial records. There is no offline data cache or write queue; reconnect to load or save data.
+- Reminders are in-app only—not push notifications or emails. There are no receipt uploads, OCR, account deletion or in-app email-address changes.
+- Vehicle suggestions are not an exhaustive or continuously updated catalogue; images are generic illustrations.
+- The owner is responsible for a production privacy policy, retention rules, support contact and SMTP configuration.
 
-The supplied yoga_studio reference contained a `CLAUDE.md` but no separate installed skill directories. myCar's guidance is adapted to this app; it does not import yoga_studio's ERP roles or RPC-only data contract. These files are repository instructions, not globally installed plugins or executable hooks.
-
-## Structure
+## Project guide
 
 ```text
-AGENTS.md           Canonical coding-agent project instructions
-CLAUDE.md           Claude Code import and skill pointers
-.claude/skills/     Repo-local Supabase, UI, PWA, and verification workflows
-src/
-  components/       Shared UI, charts, forms, layout, action dialogs
-  lib/              Supabase client, auth context, data layer, logic, PWA/theme
-  pages/            Auth, setup, dashboard, expenses, vehicles, profile, settings
-  styles.css        Responsive light/dark design system
-public/             Manifest, static-only worker, icons, fonts/licenses, hero image
-supabase/           Complete idempotent schema and security policies
-tests/              Logic, SQL/RLS, browser UI, mocked Auth contract tests
-scripts/            Public-credential security check
+src/components/    Shared interface components
+src/pages/         Authentication, dashboard, vehicles, expenses and settings
+src/lib/           Data, authentication, calculations and PWA utilities
+public/            PWA assets and static service worker
+supabase/          Canonical schema and database policies
+tests/             Logic, database and browser tests
+docs/              Verification, versioning and deployment notes
 ```
+
+[`AGENTS.md`](AGENTS.md) contains the project instructions for coding agents; [`CLAUDE.md`](CLAUDE.md) and [repo-local skills](.claude/README.md) provide additional guidance. For releases, see [`docs/VERSIONING.md`](docs/VERSIONING.md) and [`docs/GITHUB_PUSH.md`](docs/GITHUB_PUSH.md).
+
+myCar adapts the technical foundation of [yoga_studio](https://github.com/rajeshlande/yoga_studio). The interface and vehicle and expense workflows are specific to myCar. See [third-party notices](THIRD_PARTY_NOTICES.md).
 
 ## License
 
-MIT. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
-
-### Vehicle types and fuel
-
-myCar supports car body styles, motorcycles, scooters and mopeds. Make and model suggestions are a convenience, not an exhaustive or continuously updated catalogue: type any make and model, including imported or discontinued vehicles. Choose a suggested fuel or powertrain, or enter a custom value (up to 50 characters).
-
-**Existing Supabase projects:** Before deploying this app version, back up your project and run the updated `supabase/schema.sql` in the Supabase SQL Editor. Its vehicle constraint upgrade preserves existing rows and is idempotent for the standard v1 schema. Custom database constraints may require an independently reviewed migration. Until the SQL upgrade is applied, existing database constraints reject new body/fuel types. Never put privileged keys in the app.
-
-### Expense payment method
-
-Record an optional payment method (UPI, RuPay credit card via UPI, credit/debit card, cash, net banking, bank transfer, mobile wallet, cheque or other) when adding or editing an expense. It is a label only: myCar does not process payments or collect card details. Existing expenses remain “Not specified”. CSV exports include the method.
-
-**Before deploying this version:** Back up your Supabase project, then run the updated `supabase/schema.sql` in SQL Editor. The upgrade adds a nullable payment method to existing expenses without assigning a method to old records. The SQL also includes the earlier vehicle-type upgrade. Test on a staging project first, especially if you have customized your schema. No live database migration is performed by the deployment workflow.
-
-### Customize dashboard tiles
-
-Select **Customize** on the Dashboard to show or hide summary cards, the vehicle spotlight, budget, reminders, charts and recent expenses. Select **Show all tiles** to reset the choices. Signed-in choices are stored in your Supabase profile and follow your account across devices. Sample workspace changes are temporary and reset when you refresh.
-
-Before deploying this feature, back up your Supabase project and run the updated canonical `supabase/schema.sql` in SQL Editor (test on staging first if your schema is customized). It adds an account-owned `dashboard_tiles` preference with defaults that keep existing tiles visible. No live migration is run automatically.
+MIT — see [LICENSE](LICENSE).
