@@ -17,7 +17,7 @@ myCar is a mobile-first, installable web app built with React, Vite and Supabase
 ## Features
 
 - **Your garage:** manage multiple cars, motorcycles, scooters and mopeds; set a default vehicle and view its expense history. Make and model suggestions support Indian vehicles, while custom entries cover anything not listed. Fuel choices include alternative, dual-fuel and custom values.
-- **Expense tracking:** add, edit and delete expenses; filter, search, sort and export results as CSV. Optional payment methods are labels only—myCar does not process payments or collect card details.
+- **Expense tracking:** record car washes and other costs; add, edit and delete expenses; filter, search, sort and export results as CSV. Optional payment methods are labels only—myCar does not process payments or collect card details.
 - **Dashboard:** review monthly spending, fuel and service costs, trends, categories, budget progress and recent activity. Customize which sections are visible; signed-in preferences follow your account across devices.
 - **Care reminders:** see upcoming and overdue service and insurance dates in the app.
 - **Your account:** sign up, confirm your email, sign in, reset your password, and update your profile and preferences.
@@ -59,7 +59,7 @@ VITE_SUPABASE_ANON_KEY=your-publishable-or-anon-key
 
 These are browser-visible values. **Never use a service-role key, secret key, database password or SMTP credential in a `VITE_` variable.** Public keys depend on correctly configured RLS and grants.
 
-**Existing projects:** Back up first and test the current schema on staging, especially if you have customized tables or constraints. The canonical script includes the upgrades for vehicle types and fuels, expense payment methods and account dashboard preferences. It is designed to be rerunnable for the standard schema, but `CREATE TABLE IF NOT EXISTS` does not merge arbitrary existing schemas. Deployment does not run SQL for you.
+**Existing projects:** Back up first and test the current schema on staging, especially if you have customized tables or constraints. The canonical script includes the upgrades for vehicle types and fuels, expense payment methods and account dashboard preferences, and the car-wash expense category. It is designed to be rerunnable for the standard schema, but `CREATE TABLE IF NOT EXISTS` does not merge arbitrary existing schemas. Deployment does not run SQL for you.
 
 ### 3. Configure authentication redirects
 

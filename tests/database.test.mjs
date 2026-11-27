@@ -193,3 +193,22 @@ test('dashboard preferences migrate existing profiles and remain account-isolate
     await assert.rejects(() => asUser(db, USER1, tx => tx.query('update profiles set dashboard_tiles=$1 where id=$2', [JSON.stringify({ huge: 'x'.repeat(3000) }), USER1])), e => e.code === '23514');
   } finally { await db.close(); }
 });
+
+test('car wash category upgrades existing data without changing ownership or old categories', async () => {
+  const db = await database();
+  try {
+    const v1 = (await asUser(db, USER1, tx => insertVehicle(tx, 'One'))).rows[0].id;
+    const v2 = (await asUser(db, USER2, tx => insertVehicle(tx, 'Two'))).rows[0].id;
+    await asUser(db, USER1, tx => tx.query("insert into expenses(vehicle_id,title,category,amount_paise) values ($1,'Old wash','other',50000)", [v1]));
+    await db.exec("alter table expenses drop constraint expenses_category_check; alter table expenses add constraint expenses_category_check check (category in ('fuel','service','insurance','parking','tolls','other'));");
+    await assert.rejects(() => asUser(db, USER1, tx => tx.query("insert into expenses(vehicle_id,title,category,amount_paise) values ($1,'New wash','car_wash',60000)", [v1])), e => e.code === '23514');
+    await db.exec(sql);
+    await db.exec(sql);
+    await asUser(db, USER1, tx => tx.query("insert into expenses(vehicle_id,title,category,amount_paise) values ($1,'New wash','car_wash',60000)", [v1]));
+    await assert.rejects(() => asUser(db, USER1, tx => tx.query("insert into expenses(vehicle_id,title,category,amount_paise) values ($1,'Wrong vehicle','car_wash',100)", [v2])), e => e.code === '23503');
+    await assert.rejects(() => asUser(db, USER1, tx => tx.query("insert into expenses(vehicle_id,title,category,amount_paise) values ($1,'Unknown','unknown',100)", [v1])), e => e.code === '23514');
+    const rows = (await asUser(db, USER1, tx => tx.query('select title, category from expenses order by title'))).rows;
+    assert.deepEqual(rows, [{ title: 'New wash', category: 'car_wash' }, { title: 'Old wash', category: 'other' }]);
+    assert.equal((await asUser(db, USER2, tx => tx.query('select * from expenses'))).rows.length, 0);
+  } finally { await db.close(); }
+});

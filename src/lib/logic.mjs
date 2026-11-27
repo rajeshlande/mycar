@@ -4,6 +4,7 @@ export const CATEGORIES = [
   { id: 'insurance', label: 'Insurance', color: '#7896bc', tint: '#edf2f9', icon: 'ShieldCheck' },
   { id: 'parking', label: 'Parking', color: '#a18ac1', tint: '#f2edf8', icon: 'SquareParking' },
   { id: 'tolls', label: 'Tolls & FASTag', color: '#d6be72', tint: '#f8f4e6', icon: 'Route' },
+  { id: 'car_wash', label: 'Car wash', color: '#4b92a0', tint: '#e7f4f5', icon: 'Sparkles' },
   { id: 'other', label: 'Other', color: '#a6b4ad', tint: '#eff2f0', icon: 'Receipt' },
 ];
 export const categoryFor = id => CATEGORIES.find(c => c.id === id) || CATEGORIES.at(-1);

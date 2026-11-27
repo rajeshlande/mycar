@@ -69,7 +69,7 @@ create table if not exists public.expenses (
   user_id uuid not null default auth.uid() references auth.users(id) on delete cascade,
   vehicle_id uuid not null,
   title text not null check (char_length(trim(title)) between 1 and 120),
-  category text not null check (category in ('fuel','service','insurance','parking','tolls','other')),
+  category text not null check (category in ('fuel','service','insurance','parking','tolls','car_wash','other')),
   amount_paise bigint not null check (amount_paise between 1 and 999999999),
   spent_on date not null default current_date,
   odometer_km integer check (odometer_km between 0 and 2000000),
@@ -82,6 +82,12 @@ create table if not exists public.expenses (
   -- including during an update. RLS alone does not validate foreign-key targets.
   foreign key (vehicle_id, user_id) references public.vehicles(id, user_id) on delete cascade
 );
+-- Upgrade the standard v1 category constraint without changing existing expenses.
+-- Custom constraints must be reviewed separately before applying this schema.
+alter table public.expenses drop constraint if exists expenses_category_check;
+alter table public.expenses add constraint expenses_category_check
+  check (category in ('fuel','service','insurance','parking','tolls','car_wash','other'));
+
 -- Optional for existing and new expenses; existing records are not relabelled.
 alter table public.expenses add column if not exists payment_method text;
 alter table public.expenses drop constraint if exists expenses_payment_method_check;

@@ -339,3 +339,31 @@ test('mobile expense rows and native category keyboard interaction', async ({ pa
   await dialog.getByText('More details', { exact: false }).click();
   await expect(dialog.getByLabel('Payment method')).toHaveValue('upi');
 });
+
+test('car wash expense can be added, filtered, edited and exported', async ({ page }) => {
+  await enterSample(page);
+  await page.getByRole('button', { name: 'Add expense', exact: true }).first().click();
+  let dialog = page.getByRole('dialog');
+  await dialog.getByRole('radio', { name: 'Car wash' }).check();
+  await dialog.getByLabel('Amount in rupees').fill('350');
+  await dialog.getByLabel('Description').fill('Weekend wash');
+  await dialog.getByRole('button', { name: 'Save expense' }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByText('Car wash', { exact: true }).first()).toBeVisible();
+  await page.getByRole('link', { name: 'Expenses', exact: true }).click();
+  await page.getByLabel('Filter by category').selectOption('car_wash');
+  await expect(page.locator('.full-expense-table')).toContainText('Weekend wash');
+  await expect(page.locator('.full-expense-table')).toContainText('Premium car wash');
+  await page.getByRole('button', { name: 'Edit Weekend wash' }).click();
+  dialog = page.getByRole('dialog');
+  await expect(dialog.getByRole('radio', { name: 'Car wash' })).toBeChecked();
+  await dialog.getByLabel('Amount in rupees').fill('400');
+  await dialog.getByRole('button', { name: 'Save changes' }).click();
+  await expect(dialog).toHaveCount(0);
+  await expect(page.locator('.full-expense-table')).toContainText('₹400');
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export CSV' }).click();
+  const stream = await (await downloadPromise).createReadStream();
+  let csv = ''; for await (const chunk of stream) csv += chunk.toString();
+  expect(csv).toContain('Car wash'); expect(csv).toContain('Weekend wash');
+});

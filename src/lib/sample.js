@@ -19,7 +19,7 @@ export function makeSampleData() {
     ['Fuel top-up', 'fuel', 385000, 0, 'sample-creta', 'HP Petrol Pump', 24400, 36.7],
     ['Airport parking', 'parking', 35000, 0, 'sample-nexon', 'Pune Airport', null, null],
     ['FASTag recharge', 'tolls', 118000, 0, 'sample-creta', 'NHAI', null, null],
-    ['Premium car wash', 'other', 50000, 0, 'sample-creta', 'The Detailing Co.', null, null],
+    ['Premium car wash', 'car_wash', 50000, 0, 'sample-creta', 'The Detailing Co.', null, null],
     ['Fuel top-up', 'fuel', 320000, 0, 'sample-creta', 'Indian Oil', 24080, 30.5],
   ];
   const expenses = entries.map((e, i) => ({ id: `sample-expense-${i}`, user_id: 'sample-user', title: e[0], category: e[1], amount_paise: e[2], spent_on: date(1), vehicle_id: e[4], vendor: e[5], odometer_km: e[6], fuel_litres: e[7], notes: i === 1 ? 'Engine oil, oil filter, wheel alignment and a full check-up.' : '', created_at: `${date(1)}T${String(18 - i).padStart(2, '0')}:00:00Z` }));

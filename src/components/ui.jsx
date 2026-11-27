@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { CarFront, X, Check, AlertCircle, Info, Fuel, Wrench, ShieldCheck, SquareParking, Route, Receipt, ArrowUpRight, LoaderCircle, CalendarDays, ChevronLeft, ChevronRight, SearchX, Car, Plus, Bike } from 'lucide-react';
+import { CarFront, X, Check, AlertCircle, Info, Fuel, Wrench, ShieldCheck, SquareParking, Route, Receipt, ArrowUpRight, LoaderCircle, CalendarDays, ChevronLeft, ChevronRight, SearchX, Car, Plus, Bike, Sparkles } from 'lucide-react';
 import { categoryFor, currentMonth, initials, shiftMonth } from '../lib/logic.mjs';
 
 const ToastContext = createContext(null);
@@ -29,7 +29,7 @@ export function Field({ label, hint, children, className = '', ...props }) {
 }
 export function CategoryIcon({ category, size = 19, className = '' }) {
   const item = categoryFor(category);
-  const Icons = { Fuel, Wrench, ShieldCheck, SquareParking, Route, Receipt };
+  const Icons = { Fuel, Wrench, ShieldCheck, SquareParking, Route, Receipt, Sparkles };
   const Icon = Icons[item.icon] || Receipt;
   return <span className={`category-icon ${className}`} style={{ '--category-color': item.color, '--category-tint': item.tint }}><Icon size={size} strokeWidth={1.8}/></span>;
 }

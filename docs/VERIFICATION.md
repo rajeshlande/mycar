@@ -1,3 +1,12 @@
+# Verification update: v1.6.0
+
+- Logic/database suite: 21 passed, including old-schema upgrade, idempotence, preserved categories and owner isolation for car-wash expenses.
+- Browser suite: 22 passed, including creating, filtering, editing and exporting car-wash expenses; browser auth uses simulated responses.
+- Pages build/validation, agent-document checks, security checks and version alignment passed.
+- Hosted Supabase migration, real accounts and physical devices were not tested. Back up and test on staging before applying the canonical schema. Existing expenses are not automatically reclassified.
+
+---
+
 # Verification update: v1.5.2
 
 - Logic and PGlite database suite: 20 passed.

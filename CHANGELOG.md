@@ -4,6 +4,16 @@ All notable changes to myCar are documented here. The format follows Keep a Chan
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-11-27
+
+### Added
+
+- Added a Car wash expense category for vehicles, including filtering, dashboard breakdowns and CSV export.
+
+### Deployment
+
+- Back up and apply the updated canonical `supabase/schema.sql` before using the new category with a connected account. Existing expenses are not reclassified.
+
 ## [1.5.2] - 2026-11-01
 
 ### Changed
