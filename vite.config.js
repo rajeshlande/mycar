@@ -12,6 +12,8 @@ export default defineConfig(({ mode }) => {
   if (env.VITE_SUPABASE_ANON_KEY && !isPublicKey(env.VITE_SUPABASE_ANON_KEY)) throw new Error('Refusing to bundle a privileged or invalid key. Use a publishable/anon public key only.');
   return {
     base: './',
+    // Browser-test servers use separate caches so Vite 8 can lock each safely.
+    cacheDir: process.env.MYCAR_VITE_CACHE_DIR || 'node_modules/.vite',
     define: { __APP_VERSION__: JSON.stringify(pkg.version) },
     plugins: [react(), {
       name: 'mycar-static-offline-cache',

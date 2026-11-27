@@ -1,3 +1,12 @@
+# Verification update: v1.6.1
+
+- Updated Playwright Test 1.65.1, PGlite 0.6.0, axe Playwright 4.14.1, Vite 8.4.0 and Vite React plugin 6.3.0. The Vite upgrade required isolated cache directories for the configured and unconfigured browser-test servers.
+- Node 26.13.0 with npm 11.20.0: clean `npm ci`, 21 logic/database tests and 22 browser tests passed; browser tests ran against both unconfigured and simulated-configured builds. Axe automated WCAG A/AA checks cover main screens and dialogs in both themes.
+- Pages build and validation, agent, security and version checks passed; `npm audit` reported zero vulnerabilities. A configured test build deliberately failed the Pages production-key guard because it contained a test-only Supabase key; the unconfigured build passed.
+- A Vite 8 development server fell back from occupied port 5173 to 5174. Real Windows, physical devices, screen readers, live hosted authentication and the GitHub deployment remain unverified. No schema or hosted data changed.
+
+---
+
 # Verification update: v1.6.0
 
 - Logic/database suite: 21 passed, including old-schema upgrade, idempotence, preserved categories and owner isolation for car-wash expenses.

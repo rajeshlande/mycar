@@ -29,7 +29,7 @@ myCar is a mobile-first, installable web app built with React, Vite and Supabase
 
 ### Requirements
 
-- Node.js **20.19 or later** (Node 22 recommended)
+- Node.js **22.12 or later** (Node 26 LTS recommended; CI uses Node 26)
 - npm
 - A Supabase project with email authentication enabled for real accounts
 - HTTPS for deployed PWA features; localhost works for development
@@ -128,7 +128,7 @@ npm run test:browser
 
 Linux/CI may require `npx playwright install --with-deps chromium`. The suite uses local servers and intercepted Supabase responses; it does not prove a hosted project or mailbox works. See [`docs/VERIFICATION.md`](docs/VERIFICATION.md) for test details and outstanding checks.
 
-If port 5173 is occupied, use the fallback URL or choose a port with `npm run dev -- --port 5174`. Close an old development server only if you recognize it; do not terminate an unknown process.
+If port 5173 is occupied, use the fallback URL or choose a port with `npm run dev -- --port 5174`. Close an old development server only if you recognize it; do not terminate an unknown process. Vite 8 may also prevent a second development server for the same project from sharing its cache; use the existing server or stop the recognized old server before starting another.
 
 ## Data, privacy and limitations
 

@@ -4,6 +4,13 @@ All notable changes to myCar are documented here. The format follows Keep a Chan
 
 ## [Unreleased]
 
+## [1.6.1] - 2026-11-01
+
+### Changed
+
+- Updated Playwright Test to 1.65.1, PGlite to 0.6.0, axe Playwright to 4.14.1, and Vite and its React plugin to 8.4.0 and 6.3.0.
+- Set the minimum Node version to 22.12, with Node 26 LTS used in GitHub Actions.
+
 ## [1.6.0] - 2026-11-27
 
 ### Added

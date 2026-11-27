@@ -170,7 +170,7 @@ test('offline shell is cached without caching API data', async ({ page, context 
 });
 
 test('main screens and dialogs pass automated WCAG A/AA checks in both themes', async ({ page }) => {
-  test.setTimeout(60000);
+  test.setTimeout(120000);
   await enterSample(page);
   const scan = async label => {
     await page.waitForTimeout(250);

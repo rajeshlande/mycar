@@ -13,6 +13,7 @@ export default defineConfig({
     {
       command: 'npm run dev -- --port 5174 --strictPort',
       env: {
+        MYCAR_VITE_CACHE_DIR: 'node_modules/.vite-test-configured',
         VITE_SUPABASE_URL: 'https://mycar-test.supabase.co',
         VITE_SUPABASE_ANON_KEY: 'sb_publishable_browser_test_key_not_a_real_key',
       },
@@ -27,7 +28,7 @@ export default defineConfig({
       // the variables here also overrides a developer's local .env.local,
       // because Vite's loadEnv gives process.env the final word.
       command: 'npm run dev -- --port 5175 --strictPort',
-      env: { VITE_SUPABASE_URL: '', VITE_SUPABASE_ANON_KEY: '' },
+      env: { MYCAR_VITE_CACHE_DIR: 'node_modules/.vite-test-unconfigured', VITE_SUPABASE_URL: '', VITE_SUPABASE_ANON_KEY: '' },
       url: 'http://127.0.0.1:5175',
       reuseExistingServer: false,
       timeout: 30000,
