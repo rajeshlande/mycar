@@ -1,3 +1,12 @@
+# Verification update: v1.6.2
+
+- Audited the actual myCar stack: React/Vite, not Vue or TypeScript. Vite 8.4.0 and React plugin 6.3.0 declare compatible Node engines; the React plugin requires Vite 8. Vite 8's Rolldown migration warrants testing custom plugins; the static cache plugin passed the build and Pages checks.
+- Node 26.13.1 and npm 11.20.0 on Linux: clean npm ci, production and Pages builds, Pages validation, 21 logic/database tests, and 22 browser tests passed. Agent, security and version checks passed; npm audit reported zero vulnerabilities.
+- Existing `.nvmrc` is the CI Node version source; CI checks npm 11.20.0 explicitly. No Dockerfile, `.node-version`, Vue plugin or TypeScript configuration was present in the repository.
+- GitHub Actions deployment, live Supabase, and Windows setup have not been verified. No schema or hosted data changed.
+
+---
+
 # Verification update: v1.6.1
 
 - Updated Playwright Test 1.65.1, PGlite 0.6.0, axe Playwright 4.14.1, Vite 8.4.0 and Vite React plugin 6.3.0. The Vite upgrade required isolated cache directories for the configured and unconfigured browser-test servers.

@@ -59,7 +59,7 @@ myCar currently uses **direct Supabase table access protected by RLS and least-p
 
 ## Commands
 
-Use Node **22.12+**; CI uses Node 26 LTS. Do not invent lint or typecheck scripts that are not in `package.json`.
+Use Node **26.13.1+** and npm **11.20.0+**; CI pins Node 26.13.1 using `.nvmrc`. Do not invent lint or typecheck scripts that are not in `package.json`.
 
 ```sh
 npm ci

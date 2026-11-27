@@ -29,7 +29,7 @@ myCar is a mobile-first, installable web app built with React, Vite and Supabase
 
 ### Requirements
 
-- Node.js **22.12 or later** (Node 26 LTS recommended; CI uses Node 26)
+- Node.js **26.13.1 or later** and npm **11.20.0 or later** (`.nvmrc` and CI pin Node 26.13.1)
 - npm
 - A Supabase project with email authentication enabled for real accounts
 - HTTPS for deployed PWA features; localhost works for development

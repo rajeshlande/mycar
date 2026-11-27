@@ -4,6 +4,12 @@ All notable changes to myCar are documented here. The format follows Keep a Chan
 
 ## [Unreleased]
 
+## [1.6.2] - 2026-11-01
+
+### Changed
+
+- Pin the Node.js toolchain to Node 26.13.1 and npm 11.20.0 in CI, add `.nvmrc`, and document the new minimum versions.
+
 ## [1.6.1] - 2026-11-01
 
 ### Changed
